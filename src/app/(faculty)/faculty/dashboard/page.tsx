@@ -1,12 +1,11 @@
 import { requireProfile } from "@/lib/auth/get-profile";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { CASE_STATUS_LABELS, RISK_LEVEL_COLORS } from "@/types";
 import { cn, formatDate } from "@/lib/utils";
 import { FacultyCharts } from "@/components/faculty/faculty-charts";
 import {
-  AlertTriangle, FolderOpen, CheckCircle2, TrendingUp,
-  Clock, ArrowRight, Bell, Users,
+  AlertTriangle, CheckCircle2,
+  Clock, ArrowRight, Bell,
 } from "lucide-react";
 
 export default async function FacultyDashboard() {

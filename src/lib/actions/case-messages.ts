@@ -22,7 +22,7 @@ export async function sendCaseMessage(caseId: string, content: string) {
 }
 
 export async function respondToIdentityReveal(requestId: string, accept: boolean) {
-  const profile = await requireProfile(["student"]);
+  await requireProfile(["student"]);
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -57,7 +57,7 @@ export async function updateCaseStatus(
   caseId: string,
   status: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated"
 ) {
-  const profile = await requireProfile(["faculty", "admin"]);
+  await requireProfile(["faculty", "admin"]);
   const supabase = await createClient();
 
   const { error } = await supabase

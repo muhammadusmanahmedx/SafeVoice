@@ -3,11 +3,11 @@ import { requireProfile } from "@/lib/auth/get-profile";
 import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MOOD_OPTIONS, CASE_STATUS_LABELS, RISK_LEVEL_COLORS } from "@/types";
+import { MOOD_OPTIONS, CASE_STATUS_LABELS } from "@/types";
 import {
   MessageCircle, Smile, BookOpen, FolderOpen,
-  ArrowRight, TrendingUp, Sparkles, TrendingDown, Minus,
-  AlertTriangle, CheckCircle2, Clock, MoreHorizontal,
+  ArrowRight, TrendingUp, Sparkles,
+  AlertTriangle, CheckCircle2, Clock,
 } from "lucide-react";
 import { formatDate, cn } from "@/lib/utils";
 

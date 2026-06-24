@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireApiProfile } from "@/lib/auth/get-profile";
 import { formatDate } from "@/lib/utils";
 
-export async function GET(req: Request) {
+export async function GET() {
   const auth = await requireApiProfile();
   if ("error" in auth) return Response.json({ error: auth.error }, { status: auth.status });
   const { profile } = auth;
