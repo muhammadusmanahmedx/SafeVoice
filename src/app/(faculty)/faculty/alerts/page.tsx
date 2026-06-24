@@ -1,0 +1,70 @@
+import { requireProfile } from "@/lib/auth/get-profile";
+import { createClient } from "@/lib/supabase/server";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { CASE_STATUS_LABELS, RISK_LEVEL_COLORS } from "@/types";
+import { cn, formatDate } from "@/lib/utils";
+
+export default async function AlertsPage() {
+  const profile = await requireProfile(["faculty", "admin"]);
+  const supabase = await createClient();
+
+  const { data: cases } = await supabase
+    .from("anonymous_cases" as "cases")
+    .select("*")
+    .eq("institution_id", profile.institution_id)
+    .in("status", ["new", "escalated"])
+    .order("created_at", { ascending: false });
+
+  const sorted = (cases ?? []).sort((a, b) => {
+    const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+    return (
+      (severityOrder[a.severity as keyof typeof severityOrder] ?? 4) -
+      (severityOrder[b.severity as keyof typeof severityOrder] ?? 4)
+    );
+  });
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">Alert Inbox</h1>
+        <p className="text-sm text-muted-foreground">Cases requiring attention, sorted by severity</p>
+      </div>
+
+      <div className="space-y-3">
+        {sorted.map((c) => (
+          <Link key={c.id} href={`/faculty/cases/${c.id}`}>
+            <Card className="transition-shadow hover:shadow-md">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{CASE_STATUS_LABELS[c.status]}</Badge>
+                      <span className="text-xs capitalize text-muted-foreground">
+                        {c.incident_type.replace("_", " ")}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm">{c.summary}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{formatDate(c.created_at)}</p>
+                  </div>
+                  <span
+                    className={cn(
+                      "shrink-0 rounded-full border px-3 py-1 text-xs font-medium capitalize",
+                      RISK_LEVEL_COLORS[c.severity]
+                    )}
+                  >
+                    {c.severity}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+        {sorted.length === 0 && (
+          <p className="text-sm text-muted-foreground">No alerts in your inbox.</p>
+        )}
+      </div>
+    </div>
+  );
+}
