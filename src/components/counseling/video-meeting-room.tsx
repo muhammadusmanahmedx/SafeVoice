@@ -73,7 +73,10 @@ export function VideoMeetingRoom({ bookingId, backHref }: VideoMeetingRoomProps)
 
   const fetchCreds = useCallback(async () => {
     setState("loading");
-    const res = await fetch(`/api/counseling/meeting/${bookingId}`);
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const res = await fetch(`/api/counseling/meeting/${bookingId}`, {
+      headers: { "X-User-Timezone": timeZone },
+    });
     const json = await res.json();
     if (!res.ok) {
       setError(json.error ?? "Could not load meeting credentials.");

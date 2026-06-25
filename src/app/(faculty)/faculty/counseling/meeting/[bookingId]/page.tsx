@@ -1,10 +1,8 @@
 import { requireProfile } from "@/lib/auth/get-profile";
 import { createClient } from "@/lib/supabase/server";
-import { VideoMeetingRoom } from "@/components/counseling/video-meeting-room";
-import { canJoinSession, joinOpensAt } from "@/lib/counseling/meeting-access";
+import { MeetingAccessGate } from "@/components/counseling/meeting-access-gate";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
 
 interface PageProps {
   params: Promise<{ bookingId: string }>;
@@ -52,25 +50,12 @@ export default async function FacultyMeetingPage({ params }: PageProps) {
     );
   }
 
-  if (!canJoinSession(slot.slot_at, slot.duration_minutes)) {
-    const opensAt = joinOpensAt(slot.slot_at);
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
-        <h2 className="text-xl font-semibold">Session not yet open</h2>
-        <p className="text-sm text-muted-foreground">
-          You can join on{" "}
-          <span className="font-medium">{format(opensAt, "EEE, MMM d")}</span>.
-        </p>
-        <Button asChild variant="outline">
-          <Link href="/faculty/counseling">Back</Link>
-        </Button>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex min-h-screen flex-col">
-      <VideoMeetingRoom bookingId={bookingId} backHref="/faculty/counseling" />
-    </div>
+    <MeetingAccessGate
+      bookingId={bookingId}
+      backHref="/faculty/counseling"
+      slotAt={slot.slot_at}
+      durationMinutes={slot.duration_minutes}
+    />
   );
 }

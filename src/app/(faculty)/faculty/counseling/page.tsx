@@ -4,8 +4,8 @@ import { WeeklyHoursEditor } from "@/components/faculty/weekly-hours-editor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { canJoinSession, joinOpensAt, isBookingActive } from "@/lib/counseling/meeting-access";
-import { format } from "date-fns";
+import { canJoinSession, formatSessionDay, isBookingActive } from "@/lib/counseling/meeting-access";
+import { getUserTimeZoneFromCookies, resolveTimeZone } from "@/lib/counseling/timezone";
 import Link from "next/link";
 import { Calendar, User, Video } from "lucide-react";
 
@@ -37,9 +37,11 @@ export default async function FacultyCounselingPage() {
     : { data: [] };
   const studentMap = new Map((students ?? []).map((s) => [s.id, s.display_name]));
 
+  const timeZone = resolveTimeZone(getUserTimeZoneFromCookies());
+
   const upcomingBookings = (bookings ?? []).filter((b) => {
     const slot = b.slot as { slot_at: string } | null;
-    return slot && isBookingActive(slot.slot_at);
+    return slot && isBookingActive(slot.slot_at, undefined, timeZone);
   });
 
   const initialDuration = weeklyRows?.[0]?.duration_minutes ?? 30;
@@ -78,8 +80,7 @@ export default async function FacultyCounselingPage() {
                 duration_minutes: number;
               };
               const studentName = studentMap.get(booking.student_id) ?? "Student";
-              const joinable = canJoinSession(slot.slot_at, slot.duration_minutes);
-              const opensAt = joinOpensAt(slot.slot_at);
+              const joinable = canJoinSession(slot.slot_at, slot.duration_minutes, undefined, timeZone);
               return (
                 <div
                   key={booking.id}
@@ -109,7 +110,7 @@ export default async function FacultyCounselingPage() {
                       )}
                       {!joinable && (
                         <p className="mt-1 text-xs text-muted-foreground">
-                          Join available on {format(opensAt, "EEE, MMM d")}
+                          Join available on {formatSessionDay(slot.slot_at, timeZone)}
                         </p>
                       )}
                     </div>

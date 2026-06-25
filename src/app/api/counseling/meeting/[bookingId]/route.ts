@@ -2,9 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import { requireApiProfile } from "@/lib/auth/get-profile";
 import { getJitsiDomain } from "@/lib/video/jitsi";
 import { canJoinSession } from "@/lib/counseling/meeting-access";
+import { getUserTimeZoneFromRequest, resolveTimeZone } from "@/lib/counseling/timezone";
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ bookingId: string }> }
 ) {
   const { bookingId } = await params;
@@ -49,7 +50,9 @@ export async function GET(
     return Response.json({ error: "This session has been cancelled." }, { status: 410 });
   }
 
-  if (!canJoinSession(slot.slot_at, slot.duration_minutes)) {
+  const timeZone = resolveTimeZone(getUserTimeZoneFromRequest(req));
+
+  if (!canJoinSession(slot.slot_at, slot.duration_minutes, undefined, timeZone)) {
     return Response.json(
       { error: "This session is only available on its scheduled day." },
       { status: 425 }

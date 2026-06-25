@@ -1,41 +1,60 @@
-function startOfDay(d: Date): Date {
-  const s = new Date(d);
-  s.setHours(0, 0, 0, 0);
-  return s;
+/** Calendar date in a timezone as YYYY-MM-DD (en-CA locale). */
+export function localDateKey(d: Date, timeZone: string): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
 }
 
-function endOfDay(d: Date): Date {
-  const e = new Date(d);
-  e.setHours(23, 59, 59, 999);
-  return e;
+function runtimeTimeZone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
 /**
- * Joinable for the entire scheduled calendar day (midnight → end of day).
+ * Joinable for the entire scheduled calendar day in the user's timezone.
  * No 15-minute early window — both student and faculty can join any time that day.
  */
 export function canJoinSession(
   slotAt: string | Date,
   _durationMinutes?: number,
-  now: Date = new Date()
+  now: Date = new Date(),
+  timeZone: string = runtimeTimeZone()
 ): boolean {
-  const day = new Date(slotAt);
-  return now >= startOfDay(day) && now <= endOfDay(day);
+  const slot = new Date(slotAt);
+  return localDateKey(slot, timeZone) === localDateKey(now, timeZone);
 }
 
-/** When the join button becomes available (start of the scheduled day). */
-export function joinOpensAt(slotAt: string | Date): Date {
-  return startOfDay(new Date(slotAt));
+/** Human-readable scheduled day for join messaging. */
+export function formatSessionDay(
+  slotAt: string | Date,
+  timeZone: string = runtimeTimeZone()
+): string {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  }).format(new Date(slotAt));
 }
 
 /**
  * Whether a booking should still be shown as active/upcoming. It stays until the
  * end of its scheduled day, then disperses (hidden) the following day.
  */
-export function isBookingActive(slotAt: string | Date, now: Date = new Date()): boolean {
-  return now <= endOfDay(new Date(slotAt));
+export function isBookingActive(
+  slotAt: string | Date,
+  now: Date = new Date(),
+  timeZone: string = runtimeTimeZone()
+): boolean {
+  return localDateKey(now, timeZone) <= localDateKey(new Date(slotAt), timeZone);
 }
 
-export function isSameSessionDay(slotAt: string | Date, now: Date = new Date()): boolean {
-  return canJoinSession(slotAt, undefined, now);
+export function isSameSessionDay(
+  slotAt: string | Date,
+  now: Date = new Date(),
+  timeZone: string = runtimeTimeZone()
+): boolean {
+  return canJoinSession(slotAt, undefined, now, timeZone);
 }

@@ -28,7 +28,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { bookCounselingSession, cancelCounselingBooking } from "@/lib/actions/counseling";
-import { canJoinSession, isBookingActive, joinOpensAt } from "@/lib/counseling/meeting-access";
+import { canJoinSession, isBookingActive, formatSessionDay } from "@/lib/counseling/meeting-access";
 import Link from "next/link";
 import {
   formatTimeLabel,
@@ -213,7 +213,7 @@ export function CounselingBookingPanel({
                     )}
                     {!canJoinSession(booking.slot.slot_at, booking.slot.duration_minutes) && (
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Join available on {format(joinOpensAt(booking.slot.slot_at), "EEE, MMM d")}
+                        Join available on {formatSessionDay(booking.slot.slot_at)}
                       </p>
                     )}
                   </div>
