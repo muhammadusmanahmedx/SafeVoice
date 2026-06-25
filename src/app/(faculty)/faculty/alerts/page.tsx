@@ -41,6 +41,11 @@ export default async function AlertsPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <Badge variant="outline">{CASE_STATUS_LABELS[c.status]}</Badge>
+                      {(c as { auto_alerted?: boolean }).auto_alerted && (
+                        <Badge variant="secondary" className="text-amber-700 bg-amber-500/10">
+                          Auto-alert
+                        </Badge>
+                      )}
                       <span className="text-xs capitalize text-muted-foreground">
                         {c.incident_type.replace("_", " ")}
                       </span>

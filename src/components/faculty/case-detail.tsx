@@ -13,7 +13,7 @@ import {
 import { CASE_STATUS_LABELS, RISK_LEVEL_COLORS } from "@/types";
 import { formatDate, cn } from "@/lib/utils";
 import type { CaseStatus } from "@/types";
-import { UserX, Clock, CheckCircle2, XCircle, MessageCircle, StickyNote, Shield } from "lucide-react";
+import { UserX, Clock, CheckCircle2, XCircle, MessageCircle, StickyNote, Shield, User, AlertTriangle } from "lucide-react";
 
 interface RevealRequest {
   id: string;
@@ -35,13 +35,16 @@ interface FacultyCaseDetailProps {
     others_affected: boolean | null;
     recommended_action: string | null;
     created_at: string;
+    identity_revealed?: boolean;
+    auto_alerted?: boolean;
   };
   messages: { id: string; sender_role: string; content: string; created_at: string }[];
   notes: { id: string; content: string; created_at: string }[];
+  studentInfo?: { display_name: string | null; avatar_url: string | null } | null;
   revealRequests?: RevealRequest[];
 }
 
-export function FacultyCaseDetail({ caseData, messages, notes, revealRequests = [] }: FacultyCaseDetailProps) {
+export function FacultyCaseDetail({ caseData, messages, notes, studentInfo, revealRequests = [] }: FacultyCaseDetailProps) {
   const router = useRouter();
   const [status, setStatus] = useState(caseData.status);
   const [response, setResponse] = useState("");
@@ -89,11 +92,24 @@ export function FacultyCaseDetail({ caseData, messages, notes, revealRequests = 
   }
 
   const revealStatus = latestReveal?.status;
+  const identityKnown = caseData.identity_revealed && !!studentInfo;
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       {/* Main column */}
       <div className="space-y-5 lg:col-span-2">
+        {caseData.auto_alerted && (
+          <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+            <div>
+              <p className="text-sm font-semibold text-amber-700">Auto-detected high-risk alert</p>
+              <p className="mt-0.5 text-xs text-amber-600">
+                SafeVoice flagged this conversation automatically. The student has not formally submitted a report yet.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Case header */}
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -194,7 +210,7 @@ export function FacultyCaseDetail({ caseData, messages, notes, revealRequests = 
             <h3 className="text-sm font-semibold">Student Identity</h3>
           </div>
 
-          {!revealRequested && (
+          {!identityKnown && !revealRequested && (
             <>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                 <UserX className="h-4 w-4 shrink-0" />
@@ -209,7 +225,32 @@ export function FacultyCaseDetail({ caseData, messages, notes, revealRequests = 
             </>
           )}
 
-          {revealRequested && revealStatus === "pending" && (
+          {identityKnown && (
+            <div className="rounded-lg bg-green-500/10 border border-green-500/20 p-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/20">
+                  {studentInfo?.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={studentInfo.avatar_url}
+                      alt=""
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <User className="h-5 w-5 text-green-700" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-green-700">
+                    {studentInfo?.display_name ?? "Student"}
+                  </p>
+                  <p className="text-xs text-green-600">Identity shared with consent</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!identityKnown && revealRequested && revealStatus === "pending" && (
             <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-amber-600 shrink-0" />
@@ -226,14 +267,14 @@ export function FacultyCaseDetail({ caseData, messages, notes, revealRequests = 
             </div>
           )}
 
-          {revealRequested && revealStatus === "accepted" && (
+          {!identityKnown && revealRequested && revealStatus === "accepted" && (
             <div className="rounded-lg bg-green-500/10 border border-green-500/20 p-3">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
                 <p className="text-sm font-medium text-green-700">Identity Shared</p>
               </div>
               <p className="mt-1 text-xs text-green-600">
-                The student has agreed to share their identity. Contact your administrator for details.
+                The student accepted your request. Refresh the page to view their profile.
               </p>
               {latestReveal?.responded_at && (
                 <p className="mt-1.5 text-[10px] text-muted-foreground">
@@ -243,7 +284,7 @@ export function FacultyCaseDetail({ caseData, messages, notes, revealRequests = 
             </div>
           )}
 
-          {revealRequested && revealStatus === "declined" && (
+          {!identityKnown && revealRequested && revealStatus === "declined" && (
             <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
               <div className="flex items-center gap-2">
                 <XCircle className="h-4 w-4 text-destructive shrink-0" />

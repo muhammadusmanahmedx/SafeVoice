@@ -39,6 +39,30 @@ export async function GET() {
       });
     }
 
+    // Counseling booking confirmations for student
+    const { data: myBookings } = await supabase
+      .from("counseling_bookings")
+      .select("id, created_at, slot:counseling_slots(slot_at)")
+      .eq("student_id", profile.id)
+      .eq("status", "booked")
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    for (const b of myBookings ?? []) {
+      const slot = b.slot as { slot_at: string } | null;
+      notifications.push({
+        id: `bkg-${b.id}`,
+        type: "counseling_booked",
+        title: "Counseling session booked",
+        body: slot
+          ? `Your session is scheduled for ${new Date(slot.slot_at).toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}.`
+          : "Your counseling session has been confirmed.",
+        time: formatDate(b.created_at),
+        read: false,
+        href: "/counseling",
+      });
+    }
+
     // Identity reveal requests targeting student
     const { data: revealReqs } = await supabase
       .from("identity_reveal_requests")
@@ -72,18 +96,21 @@ export async function GET() {
     // New cases in institution
     const { data: newCases } = await supabase
       .from("anonymous_cases" as "cases")
-      .select("id, incident_type, severity, created_at")
+      .select("id, incident_type, severity, created_at, auto_alerted")
       .eq("institution_id", profile.institution_id)
       .eq("status", "new")
       .order("created_at", { ascending: false })
       .limit(10);
 
     for (const c of newCases ?? []) {
+      const autoAlerted = (c as { auto_alerted?: boolean }).auto_alerted;
       notifications.push({
         id: `case-${c.id}`,
-        type: "new_case",
-        title: "New case submitted",
-        body: `${c.incident_type.replace("_", " ")} — severity: ${c.severity}`,
+        type: autoAlerted ? "risk_alert" : "new_case",
+        title: autoAlerted ? "High-risk alert detected" : "New case submitted",
+        body: autoAlerted
+          ? `${c.incident_type.replace(/_/g, " ")} — AI auto-detected, review immediately`
+          : `${c.incident_type.replace(/_/g, " ")} — severity: ${c.severity}`,
         time: formatDate(c.created_at),
         read: false,
         href: `/faculty/cases/${c.id}`,
@@ -117,6 +144,38 @@ export async function GET() {
         read: false,
         href: `/faculty/cases/${m.case_id}`,
       });
+    }
+
+    // New counseling bookings on faculty's slots
+    const { data: mySlots } = await supabase
+      .from("counseling_slots")
+      .select("id")
+      .eq("faculty_id", profile.id);
+
+    const mySlotIds = (mySlots ?? []).map((s) => s.id);
+    if (mySlotIds.length > 0) {
+      const { data: newBookings } = await supabase
+        .from("counseling_bookings")
+        .select("id, created_at, slot:counseling_slots(slot_at)")
+        .in("slot_id", mySlotIds)
+        .eq("status", "booked")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      for (const b of newBookings ?? []) {
+        const slot = b.slot as { slot_at: string } | null;
+        notifications.push({
+          id: `fbkg-${b.id}`,
+          type: "counseling_booking_received",
+          title: "New counseling booking",
+          body: slot
+            ? `A student booked a session on ${new Date(slot.slot_at).toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}.`
+            : "A student has booked a counseling session with you.",
+          time: formatDate(b.created_at),
+          read: false,
+          href: "/faculty/counseling",
+        });
+      }
     }
 
     // Identity reveal responses

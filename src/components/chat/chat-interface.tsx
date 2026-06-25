@@ -6,9 +6,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { EscalationFlow } from "@/components/chat/escalation-flow";
-import { shouldShowEscalation } from "@/lib/ai/risk";
+import { CrisisResourcesPanel, type CrisisResource } from "@/components/chat/crisis-resources-panel";
+import { shouldShowCrisisResources, shouldShowEscalation } from "@/lib/ai/risk";
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import type { RiskAssessment } from "@/types";
-import { Send, Sparkles, Shield } from "lucide-react";
+import { Mic, MicOff, Send, Sparkles, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ChatInterfaceProps {
@@ -154,8 +156,12 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
   const [input, setInput] = useState("");
   const [escalationOpen, setEscalationOpen] = useState(false);
   const [assessment, setAssessment] = useState<RiskAssessment | null>(null);
+  const [crisisResources, setCrisisResources] = useState<CrisisResource[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const voiceBaseRef = useRef("");
+  const { isListening, isSupported, error: voiceError, toggle: toggleVoice, stop: stopVoice } =
+    useSpeechRecognition();
 
   const transport = useMemo(
     () =>
@@ -185,6 +191,15 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
         if (data.assessment) {
           setAssessment(data.assessment);
           if (shouldShowEscalation(data.assessment)) setEscalationOpen(true);
+          if (shouldShowCrisisResources(data.assessment)) {
+            try {
+              const crRes = await fetch(
+                `/api/chat/crisis-resources?category=${data.assessment.category}`
+              );
+              const crData = await crRes.json();
+              if (crData.resources) setCrisisResources(crData.resources);
+            } catch { /* non-critical */ }
+          }
         }
       } catch { /* non-critical */ }
     },
@@ -208,10 +223,28 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
   async function handleSubmit(e?: React.FormEvent) {
     e?.preventDefault();
     if (!input.trim() || isLoading) return;
+    stopVoice();
     const text = input.trim();
     setInput("");
+    voiceBaseRef.current = "";
     if (textareaRef.current) textareaRef.current.style.height = "auto";
     await sendMessage({ text });
+  }
+
+  function handleVoiceToggle() {
+    if (isListening) {
+      stopVoice();
+      return;
+    }
+    voiceBaseRef.current = input.trim() ? `${input.trim()} ` : "";
+    toggleVoice((text, isFinal) => {
+      if (isFinal) {
+        voiceBaseRef.current = `${voiceBaseRef.current}${text} `;
+        setInput(voiceBaseRef.current);
+      } else {
+        setInput(`${voiceBaseRef.current}${text}`);
+      }
+    });
   }
 
   const isEmpty = messages.length === 0;
@@ -319,13 +352,40 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
           )}
 
           <div ref={bottomRef} />
+
+          {assessment && shouldShowCrisisResources(assessment) && crisisResources.length > 0 && (
+            <CrisisResourcesPanel
+              resources={crisisResources}
+              riskLevel={assessment.riskLevel}
+              className="mt-2"
+            />
+          )}
         </div>
       </div>
 
       {/* Input */}
       <div className="shrink-0 border-t border-border p-4">
         <form onSubmit={handleSubmit} className="mx-auto max-w-2xl">
+          {voiceError && (
+            <p className="mb-2 text-center text-xs text-destructive">{voiceError}</p>
+          )}
           <div className="flex items-end gap-2 rounded-xl border border-border bg-background px-3 py-2 shadow-sm transition-all focus-within:border-primary/40 focus-within:shadow-md">
+            {isSupported && (
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className={cn(
+                  "h-8 w-8 shrink-0 rounded-lg",
+                  isListening && "bg-destructive/10 text-destructive hover:bg-destructive/20"
+                )}
+                onClick={handleVoiceToggle}
+                disabled={isLoading}
+                title={isListening ? "Stop recording" : "Speak to SafeVoice"}
+              >
+                {isListening ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+              </Button>
+            )}
             <Textarea
               ref={textareaRef}
               value={input}
@@ -336,7 +396,7 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
                   handleSubmit();
                 }
               }}
-              placeholder="Share what's on your mind… (Enter to send)"
+              placeholder={isListening ? "Listening… speak now" : "Share what's on your mind… (Enter to send)"}
               className="min-h-[36px] flex-1 resize-none border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
               rows={1}
             />

@@ -51,6 +51,10 @@ export function shouldShowEscalation(assessment: RiskAssessment): boolean {
   );
 }
 
+export function shouldShowCrisisResources(assessment: RiskAssessment): boolean {
+  return assessment.riskLevel === "high" || assessment.riskLevel === "critical";
+}
+
 export function defaultRiskAssessment(): RiskAssessment {
   return {
     riskLevel: "medium",

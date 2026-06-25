@@ -25,6 +25,14 @@ export async function respondToIdentityReveal(requestId: string, accept: boolean
   await requireProfile(["student"]);
   const supabase = await createClient();
 
+  const { data: request, error: fetchError } = await supabase
+    .from("identity_reveal_requests")
+    .select("case_id")
+    .eq("id", requestId)
+    .single();
+
+  if (fetchError || !request) return { error: fetchError?.message ?? "Request not found" };
+
   const { error } = await supabase
     .from("identity_reveal_requests")
     .update({
@@ -34,7 +42,16 @@ export async function respondToIdentityReveal(requestId: string, accept: boolean
     .eq("id", requestId);
 
   if (error) return { error: error.message };
+
+  if (accept) {
+    await supabase
+      .from("cases")
+      .update({ identity_revealed: true, updated_at: new Date().toISOString() })
+      .eq("id", request.case_id);
+  }
+
   revalidatePath("/cases");
+  revalidatePath(`/faculty/cases/${request.case_id}`);
   return { success: true };
 }
 

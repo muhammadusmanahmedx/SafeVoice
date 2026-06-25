@@ -13,7 +13,7 @@ export default async function FacultyCaseDetailPage({
   const supabase = await createClient();
 
   const { data: caseData } = await supabase
-    .from("anonymous_cases" as "cases")
+    .from("cases")
     .select("*")
     .eq("id", id)
     .eq("institution_id", profile.institution_id)
@@ -21,6 +21,16 @@ export default async function FacultyCaseDetailPage({
 
   if (!caseData) {
     return <p className="p-6 text-sm text-muted-foreground">Case not found</p>;
+  }
+
+  let studentInfo: { display_name: string | null; avatar_url: string | null } | null = null;
+  if (caseData.identity_revealed) {
+    const { data: student } = await supabase
+      .from("profiles")
+      .select("display_name, avatar_url")
+      .eq("id", caseData.student_id)
+      .single();
+    if (student) studentInfo = student;
   }
 
   const [{ data: messages }, { data: notes }, { data: revealRequests }] = await Promise.all([
@@ -42,15 +52,35 @@ export default async function FacultyCaseDetailPage({
       .limit(1),
   ]);
 
+  const safeCaseData = {
+    id: caseData.id,
+    institution_id: caseData.institution_id,
+    conversation_id: caseData.conversation_id,
+    incident_type: caseData.incident_type,
+    severity: caseData.severity,
+    summary: caseData.summary,
+    location: caseData.location,
+    duration: caseData.duration,
+    people_involved: caseData.people_involved,
+    others_affected: caseData.others_affected,
+    status: caseData.status,
+    recommended_action: caseData.recommended_action,
+    identity_revealed: caseData.identity_revealed,
+    auto_alerted: caseData.auto_alerted,
+    created_at: caseData.created_at,
+    updated_at: caseData.updated_at,
+  };
+
   return (
     <div className="space-y-4">
       <Link href="/faculty/cases" className="text-sm text-primary hover:underline">
         ← Back to cases
       </Link>
       <FacultyCaseDetail
-        caseData={caseData}
+        caseData={safeCaseData}
         messages={messages ?? []}
         notes={notes ?? []}
+        studentInfo={studentInfo}
         revealRequests={(revealRequests as Array<{ id: string; status: "pending" | "accepted" | "declined"; created_at: string; responded_at: string | null }>) ?? []}
       />
     </div>

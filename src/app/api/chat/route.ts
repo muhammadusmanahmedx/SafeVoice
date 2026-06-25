@@ -6,6 +6,7 @@ import {
   defaultRiskAssessment,
 } from "@/lib/ai/chat";
 import { requireApiProfile } from "@/lib/auth/get-profile";
+import { maybeCreateAutoAlert } from "@/lib/safeguarding/auto-alert";
 
 export async function POST(req: Request) {
   try {
@@ -92,6 +93,13 @@ export async function POST(req: Request) {
             category: riskAssessment.category,
             requires_attention: riskAssessment.requiresAttention,
             summary: riskAssessment.summary,
+          });
+
+          await maybeCreateAutoAlert(serviceClient, {
+            conversationId: finalConvId,
+            institutionId: profile.institution_id,
+            studentId: profile.id,
+            assessment: riskAssessment,
           });
         }
 

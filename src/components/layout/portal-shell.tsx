@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { signOut } from "@/lib/auth/actions";
 import {
-  Bell, BookOpen, FileBarChart, FolderOpen, LayoutDashboard,
+  Bell, BookOpen, Calendar, FileBarChart, FolderOpen, LayoutDashboard,
   LogOut, Megaphone, Menu, MessageCircle, Settings,
   Shield, Smile, TrendingUp, Users, X, type LucideIcon,
 } from "lucide-react";
@@ -19,6 +19,7 @@ const NAV_ICONS = {
   "message-circle": MessageCircle,
   smile: Smile,
   "book-open": BookOpen,
+  calendar: Calendar,
   "folder-open": FolderOpen,
   bell: Bell,
   "trending-up": TrendingUp,

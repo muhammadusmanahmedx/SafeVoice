@@ -245,6 +245,8 @@ export type Database = {
           others_affected: boolean | null;
           status: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated";
           recommended_action: string | null;
+          identity_revealed: boolean;
+          auto_alerted: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -262,6 +264,8 @@ export type Database = {
           others_affected?: boolean | null;
           status?: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated";
           recommended_action?: string | null;
+          identity_revealed?: boolean;
+          auto_alerted?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -279,6 +283,8 @@ export type Database = {
           others_affected?: boolean | null;
           status?: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated";
           recommended_action?: string | null;
+          identity_revealed?: boolean;
+          auto_alerted?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -503,6 +509,143 @@ export type Database = {
           },
         ];
       };
+      counseling_slots: {
+        Row: {
+          id: string;
+          institution_id: string;
+          faculty_id: string;
+          slot_at: string;
+          duration_minutes: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          institution_id: string;
+          faculty_id: string;
+          slot_at: string;
+          duration_minutes?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          institution_id?: string;
+          faculty_id?: string;
+          slot_at?: string;
+          duration_minutes?: number;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "counseling_slots_institution_id_fkey";
+            columns: ["institution_id"];
+            isOneToOne: false;
+            referencedRelation: "institutions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "counseling_slots_faculty_id_fkey";
+            columns: ["faculty_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      counseling_bookings: {
+        Row: {
+          id: string;
+          slot_id: string;
+          student_id: string;
+          institution_id: string;
+          topic: string | null;
+          status: "booked" | "cancelled" | "completed";
+          meeting_room_name: string | null;
+          meeting_started_at: string | null;
+          meeting_ended_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          slot_id: string;
+          student_id: string;
+          institution_id: string;
+          topic?: string | null;
+          status?: "booked" | "cancelled" | "completed";
+          meeting_room_name?: string | null;
+          meeting_started_at?: string | null;
+          meeting_ended_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          slot_id?: string;
+          student_id?: string;
+          institution_id?: string;
+          topic?: string | null;
+          status?: "booked" | "cancelled" | "completed";
+          meeting_room_name?: string | null;
+          meeting_started_at?: string | null;
+          meeting_ended_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "counseling_bookings_slot_id_fkey";
+            columns: ["slot_id"];
+            isOneToOne: false;
+            referencedRelation: "counseling_slots";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "counseling_bookings_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      faculty_weekly_availability: {
+        Row: {
+          id: string;
+          faculty_id: string;
+          institution_id: string;
+          day_of_week: number;
+          start_time: string;
+          end_time: string;
+          duration_minutes: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          faculty_id: string;
+          institution_id: string;
+          day_of_week: number;
+          start_time: string;
+          end_time: string;
+          duration_minutes?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          faculty_id?: string;
+          institution_id?: string;
+          day_of_week?: number;
+          start_time?: string;
+          end_time?: string;
+          duration_minutes?: number;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "faculty_weekly_availability_faculty_id_fkey";
+            columns: ["faculty_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       anonymous_cases: {
@@ -519,6 +662,8 @@ export type Database = {
           others_affected: boolean | null;
           status: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated";
           recommended_action: string | null;
+          identity_revealed: boolean;
+          auto_alerted: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -532,6 +677,7 @@ export type Database = {
       case_status: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated";
       resource_type: "article" | "video" | "helpline" | "institution";
       reveal_status: "pending" | "accepted" | "declined";
+      booking_status: "booked" | "cancelled" | "completed";
     };
     CompositeTypes: Record<string, never>;
   };

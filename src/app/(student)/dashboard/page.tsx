@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { requireProfile } from "@/lib/auth/get-profile";
 import { createClient } from "@/lib/supabase/server";
+import { AnnouncementsBanner } from "@/components/student/announcements-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MOOD_OPTIONS, CASE_STATUS_LABELS } from "@/types";
 import {
-  MessageCircle, Smile, BookOpen, FolderOpen,
+  MessageCircle, Smile, BookOpen, FolderOpen, Calendar,
   ArrowRight, TrendingUp, Sparkles,
   AlertTriangle, CheckCircle2, Clock,
 } from "lucide-react";
@@ -75,6 +76,7 @@ export default async function StudentDashboard() {
     { href: "/chat", icon: MessageCircle, label: "Talk to AI", sub: "Start a conversation", color: "bg-[#193852] text-white", hover: "hover:bg-[#193852]/90" },
     { href: "/mood", icon: Smile, label: "Log Mood", sub: "Daily check-in", color: "bg-violet-500/10 text-violet-700", hover: "hover:bg-violet-500/15" },
     { href: "/resources", icon: BookOpen, label: "Resources", sub: "Articles & helplines", color: "bg-emerald-500/10 text-emerald-700", hover: "hover:bg-emerald-500/15" },
+    { href: "/counseling", icon: Calendar, label: "Counseling", sub: "Book a session", color: "bg-teal-500/10 text-teal-700", hover: "hover:bg-teal-500/15" },
     { href: "/cases", icon: FolderOpen, label: "My Cases", sub: "View updates", color: "bg-amber-500/10 text-amber-700", hover: "hover:bg-amber-500/15" },
   ];
 
@@ -87,6 +89,8 @@ export default async function StudentDashboard() {
 
   return (
     <div className="space-y-7 pb-6">
+      <AnnouncementsBanner institutionId={profile.institution_id} />
+
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
@@ -131,7 +135,7 @@ export default async function StudentDashboard() {
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-sm font-extrabold uppercase tracking-wider text-[#193852]">Quick Actions</h2>
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
               {quickActions.map((a) => (
                 <Link key={a.href} href={a.href}
                   className={cn("group flex flex-col items-center gap-2 rounded-xl p-4 text-center transition-all", a.color, a.hover)}

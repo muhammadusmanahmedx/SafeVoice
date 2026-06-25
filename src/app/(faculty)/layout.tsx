@@ -5,6 +5,7 @@ const navItems = [
   { href: "/faculty/dashboard", label: "Dashboard", icon: "layout-dashboard" as const },
   { href: "/faculty/alerts", label: "Alert Inbox", icon: "bell" as const },
   { href: "/faculty/cases", label: "Cases", icon: "folder-open" as const },
+  { href: "/faculty/counseling", label: "Counseling", icon: "calendar" as const },
   { href: "/faculty/patterns", label: "Patterns", icon: "trending-up" as const },
 ];
 
