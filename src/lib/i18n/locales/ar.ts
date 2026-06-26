@@ -286,6 +286,7 @@ export const ar: Dictionary = {
       tagline: "مبني لسلامة الطلاب. مجهول بالكامل. مستند إلى أسس سريرية.",
       signIn: "تسجيل الدخول",
       getStarted: "ابدأ الآن",
+      privacy: "الخصوصية",
     },
   },
 

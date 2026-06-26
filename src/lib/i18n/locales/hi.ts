@@ -286,6 +286,7 @@ export const hi: Dictionary = {
       tagline: "छात्र सुरक्षा के लिए निर्मित। पूर्णतः गुमनाम। चिकित्सकीय रूप से सूचित।",
       signIn: "लॉग इन",
       getStarted: "शुरू करें",
+      privacy: "गोपनीयता",
     },
   },
 

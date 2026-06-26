@@ -11,19 +11,23 @@ export function NativeShellInit() {
   useEffect(() => {
     if (!isNativeApp()) return;
 
+    const platform = Capacitor.getPlatform();
+
     void (async () => {
       try {
-        // White icons on both platforms
-        await StatusBar.setStyle({ style: Style.Light });
+        // "Dark" style = white icons, for our navy (#193852) status bar.
+        await StatusBar.setStyle({ style: Style.Dark });
 
-        // setBackgroundColor is Android-only — safe to ignore on iOS
-        if (Capacitor.getPlatform() === "android") {
+        if (platform === "android") {
+          // Android reserves a solid navy bar; WebView sits below it.
           await StatusBar.setBackgroundColor({ color: "#193852" });
+          await StatusBar.setOverlaysWebView({ overlay: false });
+        } else if (platform === "ios") {
+          // iOS always floats the status bar over content; let the WebView go
+          // edge-to-edge and our StatusBarBackdrop strip + safe-area padding
+          // handle the navy backdrop and spacing.
+          await StatusBar.setOverlaysWebView({ overlay: true });
         }
-
-        // Ensure the WebView is NOT covered by the status bar overlay.
-        // overlaysWebView: false in config handles it, but call again at runtime for safety.
-        await StatusBar.setOverlaysWebView({ overlay: false });
       } catch {
         // StatusBar plugin unavailable (e.g. web preview)
       }

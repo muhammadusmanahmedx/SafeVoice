@@ -41,9 +41,12 @@ const config: CapacitorConfig = {
       // iOS uses LaunchScreen storyboard
     },
     StatusBar: {
-      // Navy bar, white text/icons — applies on both Android & iOS
+      // Navy bar with WHITE icons. In Capacitor, style "DARK" means
+      // "light content" (white icons) for use on a dark background.
       backgroundColor: "#193852",
-      style: "LIGHT",
+      style: "DARK",
+      // Android: don't draw under the status bar (reserve space, paint navy).
+      // iOS overlay is forced on at runtime in NativeShellInit.
       overlaysWebView: false,
     },
     Keyboard: {

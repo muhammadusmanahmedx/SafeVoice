@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Download, Plus, Share, MoreVertical } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
+import { isNativeApp } from "@/lib/capacitor/is-native";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +25,7 @@ export function DownloadAppButton({ label, variant = "hero", className }: Downlo
   const { canInstall, canNativeInstall, isIos, promptInstall } = usePwaInstall();
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  if (!canInstall) return null;
+  if (isNativeApp() || !canInstall) return null;
 
   const text = label ?? t("landing.hero.downloadApp");
 

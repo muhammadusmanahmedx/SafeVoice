@@ -22,13 +22,16 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex flex-1 items-center justify-center px-6 py-12">
+      <div className="flex flex-1 items-center justify-center px-6 py-10">
         <div className="w-full max-w-sm">
-          <div className="mb-8 flex items-center gap-2 lg:hidden">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#193852]">
-              <Shield className="h-4 w-4 text-white" />
+          <div className="mb-8 flex flex-col items-center gap-3 lg:hidden">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#193852] shadow-lg">
+              <Shield className="h-7 w-7 text-white" />
             </div>
-            <span className="text-sm font-bold text-[#193852]">SafeVoice</span>
+            <div className="text-center">
+              <p className="text-lg font-extrabold text-[#193852]">SafeVoice</p>
+              <p className="text-xs text-gray-400">Student Wellbeing Platform</p>
+            </div>
           </div>
           <LoginForm />
         </div>

@@ -284,6 +284,7 @@ export const en = {
       tagline: "Built for student safety. Fully anonymous. Clinically informed.",
       signIn: "Sign in",
       getStarted: "Get started",
+      privacy: "Privacy",
     },
   },
 

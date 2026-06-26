@@ -92,9 +92,77 @@ SafeVoice is an installable PWA (no App Store required). The service worker cach
 - Icons: `public/icon-192.png`, `public/icon-512.png`, `public/apple-touch-icon.png`
 - Service worker: `@ducanh2912/next-pwa` (disabled in `npm run dev`, enabled on production build)
 
+## Capacitor native app (App Store / Play Store)
+
+SafeVoice can ship as a **native app** using [Capacitor](https://capacitorjs.com) in **remote WebView** mode: the app loads your deployed Vercel site inside a native shell. All server features (API routes, auth, chat, counseling video) work unchanged.
+
+### 1. Deploy to Vercel first
+
+1. Push to GitHub and connect the repo on [Vercel](https://vercel.com)
+2. Set all environment variables from `.env.example`
+3. In **Supabase → Authentication → URL Configuration**:
+   - **Site URL:** `https://your-app.vercel.app`
+   - **Redirect URLs:** `https://your-app.vercel.app/**`
+
+### 2. Point Capacitor at production
+
+Set your production URL before syncing native projects:
+
+```bash
+# Windows PowerShell
+$env:CAPACITOR_SERVER_URL="https://your-app.vercel.app"
+npm run cap:sync
+```
+
+Or add to `.env.local`:
+
+```
+CAPACITOR_SERVER_URL=https://your-app.vercel.app
+```
+
+Config lives in [`capacitor.config.ts`](capacitor.config.ts).
+
+### 3. Open and run on device
+
+```bash
+npm run cap:android   # Android Studio → Run on device/emulator
+npm run cap:ios       # Xcode on Mac → Run on simulator/device
+```
+
+**Local dev on device:** temporarily set `CAPACITOR_SERVER_URL=http://YOUR_LAN_IP:3000` and run `npm run dev`.
+
+### Native permissions
+
+Camera and microphone are declared for Jitsi counseling video:
+
+- Android: `AndroidManifest.xml` (`CAMERA`, `RECORD_AUDIO`)
+- iOS: `Info.plist` (`NSCameraUsageDescription`, `NSMicrophoneUsageDescription`)
+
+### Store submission
+
+- **Privacy policy:** https://your-app.vercel.app/privacy (required by both stores)
+- **Google Play:** Build → Generate Signed Bundle (AAB) in Android Studio
+- **Apple App Store:** Archive in Xcode (Mac required); declare camera/mic usage
+
+### Device test checklist
+
+1. App opens landing page from Vercel URL
+2. Student login → dashboard
+3. AI chat send/receive
+4. Book counseling session
+5. Join Jitsi video (camera + mic)
+6. Faculty login → join same session
+7. Android back button navigates correctly
+
+PWA install prompts are hidden automatically inside the native app.
+
 ## Project Structure
 
 ```
+capacitor.config.ts  # Native app config (remote Vercel URL)
+android/             # Capacitor Android project
+ios/                 # Capacitor iOS project (build on Mac)
+resources/           # Source icon/splash for native assets
 src/
   app/
     (auth)/          # Login, register

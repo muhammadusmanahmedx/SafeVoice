@@ -3,6 +3,7 @@ import { Inter, Noto_Sans_Arabic, Noto_Sans_Devanagari } from "next/font/google"
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { InstallPrompt } from "@/components/layout/install-prompt";
 import { NativeShellInit } from "@/components/layout/native-shell-init";
+import { StatusBarBackdrop } from "@/components/layout/status-bar-backdrop";
 import { LanguageProvider } from "@/components/providers/language-provider";
 import { TimezoneCookie } from "@/components/timezone-cookie";
 import { LOCALE_COOKIE } from "@/lib/i18n";
@@ -62,6 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <ThemeProvider attribute="class" defaultTheme="light" themes={["light", "dark", "calm"]}>
           <LanguageProvider>
+            <StatusBarBackdrop />
             <NativeShellInit />
             <TimezoneCookie />
             {children}

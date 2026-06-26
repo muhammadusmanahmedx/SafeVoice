@@ -2,16 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth/actions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RedirectScreen } from "@/components/auth/redirect-screen";
 import { useLanguage } from "@/components/providers/language-provider";
+import { navigateAfterAuth } from "@/lib/capacitor/navigate-after-auth";
 import { ArrowRight, Loader2 } from "lucide-react";
 
 export function LoginForm() {
-  const router = useRouter();
   const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -33,8 +32,9 @@ export function LoginForm() {
         ? "faculty"
         : "student";
       setRedirectRole(role);
-      router.push(result.redirectTo);
-      router.refresh();
+      // Hard navigation (with a short commit delay in the native WebView)
+      // ensures the session cookie is persisted before the next page load.
+      navigateAfterAuth(result.redirectTo);
     }
   }
 

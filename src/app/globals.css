@@ -10,6 +10,21 @@
   .pt-safe {
     padding-top: env(safe-area-inset-top, 0px);
   }
+
+  .mt-safe {
+    margin-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Extends the element's background into the status bar area */
+  .safe-area-top-fill::before {
+    content: "";
+    display: block;
+    height: env(safe-area-inset-top, 0px);
+    position: absolute;
+    inset-inline: 0;
+    top: calc(-1 * env(safe-area-inset-top, 0px));
+    background: inherit;
+  }
 }
 
 @layer base {

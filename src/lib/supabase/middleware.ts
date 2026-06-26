@@ -35,7 +35,7 @@ export async function updateSession(request: NextRequest) {
     path.startsWith("/register") ||
     path.startsWith("/faculty-register");
 
-  if (!user && !isAuthPage && path !== "/") {
+  if (!user && !isAuthPage && path !== "/" && path !== "/privacy") {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

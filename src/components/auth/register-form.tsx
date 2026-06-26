@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { signUpStudent } from "@/lib/auth/actions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +9,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { useLanguage } from "@/components/providers/language-provider";
+import { navigateAfterAuth } from "@/lib/capacitor/navigate-after-auth";
 import { ArrowRight, Loader2 } from "lucide-react";
 
 interface RegisterFormProps {
@@ -17,7 +17,6 @@ interface RegisterFormProps {
 }
 
 export function RegisterForm({ institutions }: RegisterFormProps) {
-  const router = useRouter();
   const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -34,8 +33,7 @@ export function RegisterForm({ institutions }: RegisterFormProps) {
       return;
     }
     if (result?.redirectTo) {
-      router.push(result.redirectTo);
-      router.refresh();
+      navigateAfterAuth(result.redirectTo);
     }
   }
 

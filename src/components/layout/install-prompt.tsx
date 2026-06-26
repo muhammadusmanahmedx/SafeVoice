@@ -5,6 +5,7 @@ import { Download, Share, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/providers/language-provider";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
+import { isNativeApp } from "@/lib/capacitor/is-native";
 import { cn } from "@/lib/utils";
 
 const DISMISS_KEY = "safevoice-install-dismissed";
@@ -21,6 +22,7 @@ export function InstallPrompt() {
   const [mode, setMode] = useState<"android" | "ios">("android");
 
   useEffect(() => {
+    if (isNativeApp()) return;
     if (!canInstall || !isMobileDevice()) return;
     if (localStorage.getItem(DISMISS_KEY) === "1") return;
 
@@ -46,7 +48,7 @@ export function InstallPrompt() {
     if (accepted) setVisible(false);
   }
 
-  if (!visible) return null;
+  if (isNativeApp() || !visible) return null;
 
   return (
     <div
