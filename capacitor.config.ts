@@ -12,7 +12,6 @@ const config: CapacitorConfig = {
           url: serverUrl,
           // Allow cleartext only for local dev (http://); production must be HTTPS
           cleartext: serverUrl.startsWith("http://"),
-          // Android: use the native cookie manager so Supabase session cookies persist
           androidScheme: "https",
         },
       }
@@ -22,15 +21,8 @@ const config: CapacitorConfig = {
         },
       }),
   ios: {
-    // Allows Jitsi video to play inline in WKWebView without going full-screen
-    allowsInlineMediaPlayback: true,
-    // Scroll elasticity (bounce) off — feels more native
     scrollEnabled: true,
-    limitsNavigationsToAppBoundDomains: false,
-  },
-  android: {
-    // Let the WebView resize when the soft keyboard appears (fixes chat input)
-    adjustModeValue: "ADJUST_RESIZE",
+    contentInset: "automatic",
   },
   plugins: {
     SplashScreen: {
@@ -38,21 +30,12 @@ const config: CapacitorConfig = {
       backgroundColor: "#193852",
       showSpinner: false,
       androidScaleType: "CENTER_CROP",
-      // iOS uses LaunchScreen storyboard
     },
     StatusBar: {
-      // Navy bar with WHITE icons. In Capacitor, style "DARK" means
-      // "light content" (white icons) for use on a dark background.
+      // "DARK" = white icons on the navy (#193852) status bar
       backgroundColor: "#193852",
       style: "DARK",
-      // Android: don't draw under the status bar (reserve space, paint navy).
-      // iOS overlay is forced on at runtime in NativeShellInit.
       overlaysWebView: false,
-    },
-    Keyboard: {
-      // iOS: push content up when keyboard appears (same as Android adjustResize)
-      resize: "body",
-      resizeOnFullScreen: true,
     },
   },
 };
