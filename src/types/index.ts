@@ -1,4 +1,4 @@
-export type UserRole = "student" | "faculty" | "admin";
+export type UserRole = "student" | "counselor" | "admin";
 
 export type RiskLevel = "low" | "medium" | "high" | "critical";
 
@@ -33,7 +33,7 @@ export interface RiskAssessment {
 export interface EscalationData {
   location: string;
   duration: string;
-  peopleInvolved: "student" | "faculty" | "group" | "unknown";
+  peopleInvolved: "student" | "counselor" | "group" | "unknown";
   othersAffected: boolean;
 }
 

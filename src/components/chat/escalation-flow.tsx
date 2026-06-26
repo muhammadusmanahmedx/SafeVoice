@@ -178,7 +178,7 @@ export function EscalationFlow({ open, onOpenChange, conversationId, assessment 
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="student">{t("student.chat.escalation.peopleStudent")}</SelectItem>
-                    <SelectItem value="faculty">{t("student.chat.escalation.peopleFaculty")}</SelectItem>
+                    <SelectItem value="counselor">{t("student.chat.escalation.peopleCounselor")}</SelectItem>
                     <SelectItem value="group">{t("student.chat.escalation.peopleGroup")}</SelectItem>
                     <SelectItem value="unknown">{t("student.chat.escalation.peopleUnknown")}</SelectItem>
                   </SelectContent>

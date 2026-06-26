@@ -54,7 +54,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-lg font-bold text-[#0d0d0d]">How we use data</h2>
             <p>
-              Data is used to provide wellbeing support, detect safeguarding risks, enable faculty
+              Data is used to provide wellbeing support, detect safeguarding risks, enable counselor
               follow-up when appropriate, and improve institution-level anonymised analytics. AI
               chat content is processed to generate responses and risk assessments.
             </p>
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-lg font-bold text-[#0d0d0d]">Data sharing</h2>
             <p>
-              Student identities remain anonymous to faculty unless a student explicitly chooses to
+              Student identities remain anonymous to counselor unless a student explicitly chooses to
               reveal their identity during an escalation. We do not sell personal data. Data is
               stored in Supabase (PostgreSQL) with row-level security enforced per institution.
             </p>

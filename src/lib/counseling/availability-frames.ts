@@ -1,7 +1,7 @@
 import type { CounselingSlot } from "@/components/student/counseling-booking";
 
 export interface WeeklyAvailabilityRange {
-  faculty_id: string;
+  counselor_id: string;
   counselor_name: string;
   day_of_week: number;
   start_time: string;
@@ -10,7 +10,7 @@ export interface WeeklyAvailabilityRange {
 
 export interface AvailabilityFrame {
   id: string;
-  faculty_id: string;
+  counselor_id: string;
   counselor_name: string;
   start_time: string;
   end_time: string;
@@ -46,7 +46,7 @@ export function getFramesForDay(
     const rangeEnd = dateAtTime(date, range.end_time);
 
     const slotsInFrame = daySlots.filter((s) => {
-      if (s.faculty_id !== range.faculty_id) return false;
+      if (s.counselor_id !== range.counselor_id) return false;
       const slotStart = new Date(s.slot_at);
       return slotStart >= rangeStart && slotStart < rangeEnd;
     });
@@ -54,8 +54,8 @@ export function getFramesForDay(
     if (slotsInFrame.length === 0) continue;
 
     frames.push({
-      id: `${range.faculty_id}-${range.start_time}-${range.end_time}`,
-      faculty_id: range.faculty_id,
+      id: `${range.counselor_id}-${range.start_time}-${range.end_time}`,
+      counselor_id: range.counselor_id,
       counselor_name: range.counselor_name,
       start_time: range.start_time,
       end_time: range.end_time,

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
 
-type AuthBrandingVariant = "login" | "register" | "faculty";
+type AuthBrandingVariant = "login" | "register" | "counselor";
 
 interface AuthBrandingProps {
   variant?: AuthBrandingVariant;
@@ -58,7 +58,7 @@ function LoginBranding() {
   const features = [
     t("auth.featureAnonymous"),
     t("auth.featureSupport"),
-    t("auth.featureFaculty"),
+    t("auth.featureCounselor"),
     t("auth.featureEvidence"),
   ];
 
@@ -115,27 +115,27 @@ function RegisterBranding() {
   );
 }
 
-function FacultyBranding() {
+function CounselorBranding() {
   const { t } = useLanguage();
 
   const features = [
-    { icon: Bell, text: t("auth.facultyRegister.panelFeatureAlerts") },
-    { icon: FileText, text: t("auth.facultyRegister.panelFeatureCases") },
-    { icon: Users, text: t("auth.facultyRegister.panelFeaturePatterns") },
+    { icon: Bell, text: t("auth.counselorRegister.panelFeatureAlerts") },
+    { icon: FileText, text: t("auth.counselorRegister.panelFeatureCases") },
+    { icon: Users, text: t("auth.counselorRegister.panelFeaturePatterns") },
   ];
 
   return (
     <BrandingShell>
       <div className="space-y-6">
         <span className="inline-block rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-[#a38016]">
-          {t("auth.facultyRegister.panelBadge")}
+          {t("auth.counselorRegister.panelBadge")}
         </span>
         <h2 className="text-3xl font-extrabold leading-snug tracking-tight text-white">
-          {t("auth.facultyRegister.panelHeadline")}{" "}
-          <span className="text-white/60">{t("auth.facultyRegister.panelHeadlineAccent")}</span>
+          {t("auth.counselorRegister.panelHeadline")}{" "}
+          <span className="text-white/60">{t("auth.counselorRegister.panelHeadlineAccent")}</span>
         </h2>
         <p className="text-sm leading-relaxed text-white/65">
-          {t("auth.facultyRegister.panelDescription")}
+          {t("auth.counselorRegister.panelDescription")}
         </p>
         <div className="space-y-3 pt-2">
           {features.map(({ icon, text }) => (
@@ -149,6 +149,6 @@ function FacultyBranding() {
 
 export function AuthBranding({ variant = "login" }: AuthBrandingProps) {
   if (variant === "register") return <RegisterBranding />;
-  if (variant === "faculty") return <FacultyBranding />;
+  if (variant === "counselor") return <CounselorBranding />;
   return <LoginBranding />;
 }

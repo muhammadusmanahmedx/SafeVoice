@@ -37,6 +37,7 @@ android/app/build/
 android/local.properties
 ios/App/Pods/
 ios/DerivedData/
+public/downloads/*.apk
 
 # typescript
 *.tsbuildinfo

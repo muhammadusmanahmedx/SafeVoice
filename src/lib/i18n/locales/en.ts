@@ -57,7 +57,7 @@ export const en = {
 
   portal: {
     student: "Student Portal",
-    faculty: "Faculty Portal",
+    counselor: "Counselor Portal",
     admin: "Admin Portal",
     yourInstitution: "Your institution",
     safeguarding: "Safeguarding",
@@ -66,7 +66,7 @@ export const en = {
 
   nav: {
     dashboard: "Dashboard",
-    aiAssistant: "AI Assistant",
+    aiAssistant: "Counseling Chat",
     mood: "Mood",
     resources: "Resources",
     counseling: "Counseling",
@@ -74,10 +74,13 @@ export const en = {
     alertInbox: "Alert Inbox",
     cases: "Cases",
     patterns: "Patterns",
-    faculty: "Faculty",
+    counselor: "Counselor",
     announcements: "Announcements",
     reports: "Reports",
     settings: "Settings",
+    more: "More",
+    mainNavigation: "Main navigation",
+    profile: "Profile",
   },
 
   theme: {
@@ -100,7 +103,7 @@ export const en = {
     signingIn: "Signing in…",
     newStudent: "New student?",
     createAccount: "Create account",
-    facultyQuestion: "Faculty?",
+    counselorQuestion: "Counselor?",
     registerWithCode: "Register with access code",
     createYourAccount: "Create your account",
     registerSubtitle: "Join SafeVoice — a private space for student wellbeing",
@@ -119,7 +122,7 @@ export const en = {
     platformTagline: "Giving students a voice before silence becomes a crisis. 24/7 anonymous support powered by AI.",
     featureAnonymous: "Anonymous by design",
     featureSupport: "24/7 AI support",
-    featureFaculty: "Faculty connected",
+    featureCounselor: "Counselors connected",
     featureEvidence: "Evidence-based",
     rightsReserved: "All rights reserved.",
     redirectTakingYou: "Taking you there…",
@@ -133,24 +136,24 @@ export const en = {
       featureSupport247: "24/7 AI support — always there when you need it",
       featureMoodTracking: "Track your mood and spot patterns over time",
     },
-    facultyRegister: {
-      title: "Faculty Registration",
-      subtitle: "Register using your institution's faculty access code",
+    counselorRegister: {
+      title: "Counselor Registration",
+      subtitle: "Register using your institution's counselor access code",
       workEmail: "Work email",
-      facultyAccessCode: "Faculty access code",
+      counselorAccessCode: "Counselor access code",
       codeHint: "Provided by your institution administrator",
       registering: "Registering…",
-      registerAsFaculty: "Register as Faculty",
+      registerAsCounselor: "Register as Counselor",
       backToSignIn: "← Back to sign in",
-      panelBadge: "Faculty Portal",
+      panelBadge: "Counselor Portal",
       panelHeadline: "Protect students.",
       panelHeadlineAccent: "Make a difference.",
       panelDescription:
-        "The faculty portal gives you structured visibility into student concerns while maintaining anonymity and trust.",
+        "The counselor portal gives you structured visibility into student concerns while maintaining anonymity and trust.",
       panelFeatureAlerts: "Risk-sorted alerts in your inbox",
       panelFeatureCases: "Structured, anonymous case management",
       panelFeaturePatterns: "Pattern detection across your institution",
-      imageAlt: "Faculty supporting students",
+      imageAlt: "Counselor supporting students",
     },
     loginImageAlt: "Students supporting each other",
     registerImageAlt: "Students studying together",
@@ -169,7 +172,7 @@ export const en = {
       subtitle:
         "A private, anonymous AI wellbeing platform. Students get 24/7 support. Institutions get early visibility into safeguarding concerns — all in one place.",
       ctaStudent: "Start as Student",
-      ctaFaculty: "Faculty Registration",
+      ctaCounselor: "Counselor Registration",
       downloadApp: "Download our app",
       trustFullyAnonymous: "Fully anonymous",
       trust247: "24/7 available",
@@ -182,10 +185,10 @@ export const en = {
       paragraph1:
         "Many students experience bullying, harassment, burnout, or anxiety but never seek help because they fear judgment or exposure. SafeVoice provides a private, supportive environment where they can talk to an AI that truly listens.",
       paragraph2:
-        "When patterns of concern emerge, faculty are notified with structured, anonymised reports — giving institutions an early warning system that protects students and staff alike.",
+        "When patterns of concern emerge, counselor are notified with structured, anonymised reports — giving institutions an early warning system that protects students and staff alike.",
       point1: "Anonymous conversations with empathetic AI",
       point2: "Smart risk detection and structured escalation",
-      point3: "Faculty visibility without identity exposure",
+      point3: "Counselor visibility without identity exposure",
       point4: "Institution-wide safeguarding analytics",
       statAiSupport: "AI Support",
       statAnonymous: "Anonymous",
@@ -238,21 +241,21 @@ export const en = {
         cta: "Student sign up",
         imageAlt: "Students portal",
       },
-      faculty: {
-        role: "Faculty",
+      counselor: {
+        role: "Counselor",
         desc: "Structured visibility into student concerns — without compromising anonymity.",
         point1: "Risk-sorted alert inbox",
         point2: "Anonymous case management",
         point3: "Identity reveal workflow",
         point4: "Pattern detection",
-        cta: "Faculty register",
-        imageAlt: "Faculty portal",
+        cta: "Counselor register",
+        imageAlt: "Counselor portal",
       },
       administrators: {
         role: "Administrators",
         desc: "Institution-level safeguarding insights and reporting at your fingertips.",
         point1: "Safeguarding analytics",
-        point2: "Faculty management",
+        point2: "Counselor management",
         point3: "Anonymised report exports",
         point4: "Platform-wide settings",
         cta: "Admin sign in",
@@ -266,10 +269,10 @@ export const en = {
       step1Desc: "In a private, anonymous conversation about anything on their mind.",
       step2Title: "Risk is detected",
       step2Desc: "The AI silently assesses the conversation and flags concerns when needed.",
-      step3Title: "Faculty is notified",
-      step3Desc: "An anonymised structured incident report appears in the faculty inbox.",
+      step3Title: "Counselor is notified",
+      step3Desc: "An anonymised structured incident report appears in the counselor inbox.",
       step4Title: "Support is given",
-      step4Desc: "Faculty respond, manage the case, and student gets help — safely.",
+      step4Desc: "Counselor respond, manage the case, and student gets help — safely.",
     },
     cta: {
       label: "Get started today",
@@ -277,7 +280,7 @@ export const en = {
       subtitle:
         "Join institutions that trust SafeVoice to protect students, support wellbeing, and provide early safeguarding insights.",
       signUpStudent: "Sign up as Student",
-      facultyRegistration: "Faculty Registration",
+      counselorRegistration: "Counselor Registration",
       downloadApp: "Download our app",
     },
     footer: {
@@ -343,11 +346,14 @@ export const en = {
       },
     },
     chat: {
-      pageTitle: "AI Wellbeing Assistant",
+      pageTitle: "Counseling Chat",
       pageSubtitle: "Private and confidential — everything you share stays between you and SafeVoice",
-      aiName: "SafeVoice AI",
-      aiSubtitle: "Wellbeing assistant · Strictly confidential",
-      statusActive: "Active",
+      counselorName: "SafeVoice Counselor",
+      counselorSubtitle: "Here to listen · Confidential",
+      statusOnline: "Online",
+      aiName: "SafeVoice Counselor",
+      aiSubtitle: "Here to listen · Confidential",
+      statusActive: "Online",
       emptyTitle: "Hi, I'm here for you",
       emptySubtitle: "This is a safe, confidential space. What's on your mind today?",
       suggestions: {
@@ -367,17 +373,17 @@ export const en = {
       escalation: {
         offerTitle: "Additional Support Available",
         offerDescription:
-          "It sounds like this situation may benefit from faculty support. Would you like to notify a faculty member who can help?",
+          "It sounds like this situation may benefit from counselor support. Would you like to notify a counselor who can help?",
         notNow: "Not now",
-        yesNotify: "Yes, notify faculty",
+        yesNotify: "Yes, notify counselor",
         identityTitle: "How would you like to report?",
         identityDescription:
-          "You are always in control. Faculty cannot see your identity unless you choose to share it.",
+          "You are always in control. Counselor cannot see your identity unless you choose to share it.",
         stayAnonymous: "Stay anonymous",
         stayAnonymousDesc:
-          "Faculty sees the report but not your name. You stay hidden unless you choose later.",
+          "Counselor sees the report but not your name. You stay hidden unless you choose later.",
         shareIdentity: "Share my identity",
-        shareIdentityDesc: "Faculty will know this report is from you — enables more personalised support.",
+        shareIdentityDesc: "Counselor will know this report is from you — enables more personalised support.",
         detailsTitle: "Incident Details",
         detailsDescription: "Share what you're comfortable with. All fields except location are optional.",
         whereHappening: "Where is this happening?",
@@ -386,7 +392,7 @@ export const en = {
         howLongPlaceholder: "e.g. Two weeks, Since September",
         whoInvolved: "Who is involved?",
         peopleStudent: "Student",
-        peopleFaculty: "Faculty",
+        peopleCounselor: "Counselor",
         peopleGroup: "Group",
         peopleUnknown: "Unknown",
         othersAffected: "Does this affect other students?",
@@ -403,9 +409,9 @@ export const en = {
         submitWithIdentity: "Submit with Identity",
         submittedTitle: "Report Submitted",
         submittedDescription:
-          "A faculty member will review your concern shortly. Check your Cases page for updates and responses.",
+          "A counselor will review your concern shortly. Check your Cases page for updates and responses.",
         submittedAnonymousNote: " Your identity remains protected.",
-        submittedIdentifiedNote: " Your name has been shared with the faculty member.",
+        submittedIdentifiedNote: " Your name has been shared with the counselor.",
       },
       crisis: {
         criticalTitle: "Immediate support is available",
@@ -441,7 +447,7 @@ export const en = {
       upcomingSessions: "Your Upcoming Sessions",
       joinAvailableOn: "Join available on {date}",
       noAvailabilityTitle: "No counseling availability yet",
-      noAvailabilityDesc: "Faculty counselors haven't published their weekly hours. Check back soon.",
+      noAvailabilityDesc: "Counselors haven't published their weekly hours yet. Check back soon.",
       selectDate: "Select a date",
       counselorAvailable: "Counselor available",
       selectedDay: "Selected day",
@@ -482,13 +488,13 @@ export const en = {
       empty: "No cases yet. If you need support, start a conversation with the AI assistant.",
       detail: {
         messagesTitle: "Messages",
-        noMessages: "A faculty member will respond here when they review your case.",
-        facultyResponse: "Faculty Response",
+        noMessages: "A counselor will respond here when they review your case.",
+        counselorResponse: "Counselor Response",
         you: "You",
         replyPlaceholder: "Reply anonymously...",
         revealTitle: "Identity Reveal Request",
         revealDescription:
-          "A faculty member believes direct support may be beneficial. Would you like to share your identity? This is entirely your choice.",
+          "A counselor believes direct support may be beneficial. Would you like to share your identity? This is entirely your choice.",
         remainAnonymous: "Remain Anonymous",
         shareIdentity: "Share Identity",
         locationPrefix: "Location:",
@@ -502,9 +508,9 @@ export const en = {
     },
   },
 
-  faculty: {
+  counselor: {
     dashboard: {
-      title: "Faculty Dashboard",
+      title: "Counselor Dashboard",
       subtitle: "Anonymous student safeguarding overview",
       reviewAlerts: "Review Alerts",
       stats: {
@@ -622,7 +628,7 @@ export const en = {
       stats: {
         totalStudents: "Total Students",
         enrolled: "Enrolled",
-        totalFaculty: "Total Faculty",
+        totalCounselors: "Total Counselors",
         activeStaff: "Active staff",
         openCases: "Open Cases",
         needsAttention: "Needs attention",
@@ -652,23 +658,23 @@ export const en = {
         value: "Value",
       },
     },
-    faculty: {
-      pageTitle: "Faculty Management",
-      pageSubtitle: "Manage faculty accounts and registration codes",
+    counselor: {
+      pageTitle: "Counselor Management",
+      pageSubtitle: "Manage counselor accounts and registration codes",
       registrationCodes: "Registration Codes",
       generating: "Generating...",
       generateCode: "Generate Code",
-      newCodeLabel: "New faculty code (share securely):",
-      facultyAccounts: "Faculty Accounts",
+      newCodeLabel: "New counselor code (share securely):",
+      counselorAccounts: "Counselor Accounts",
       joined: "Joined {date}",
-      noFaculty: "No faculty registered yet.",
+      noCounselors: "No counselor registered yet.",
     },
     announcements: {
       pageTitle: "Announcements",
-      pageSubtitle: "Publish updates visible to faculty members",
+      pageSubtitle: "Publish updates visible to counselors",
       publishTitle: "Publish Announcement",
       publishing: "Publishing...",
-      publishToFaculty: "Publish to Faculty",
+      publishToCounselors: "Publish to Counselors",
       empty: "No announcements yet.",
     },
     reports: {
@@ -710,14 +716,14 @@ export const en = {
     empty: "No notifications yet",
     unreadOverflow: "9+",
     student: {
-      facultyRepliedTitle: "Faculty replied to your case",
+      counselorRepliedTitle: "Counselor replied to your case",
       counselingBookedTitle: "Counseling session booked",
       counselingBookedBody: "Your session is scheduled for {datetime}.",
       counselingBookedBodyFallback: "Your counseling session has been confirmed.",
       identityRequestTitle: "Identity reveal requested",
-      identityRequestBody: "A faculty member has requested to know your identity for better support.",
+      identityRequestBody: "A counselor has requested to know your identity for better support.",
     },
-    faculty: {
+    counselor: {
       highRiskAlertTitle: "High-risk alert detected",
       highRiskAlertBody: "{incidentType} — AI auto-detected, review immediately",
       newCaseTitle: "New case submitted",
@@ -786,6 +792,11 @@ export const en = {
     iosStep3: "Tap \"Add\" — SafeVoice now opens like an app.",
     androidStep1: "Tap the browser menu (⋮) in the top right.",
     androidStep2: "Choose \"Install app\" or \"Add to Home screen\".",
+    apkInstallTitle: "Install SafeVoice",
+    apkInstallIntro: "The app is downloading. Follow these steps to install it on your phone:",
+    apkStep1: "Open your Downloads folder and tap SafeVoice.apk.",
+    apkStep2: "Tap Install when prompted.",
+    apkStep3: "If asked, allow installs from your browser, then open SafeVoice.",
   },
 
   incident: {

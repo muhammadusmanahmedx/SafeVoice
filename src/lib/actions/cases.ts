@@ -36,7 +36,7 @@ export async function createCaseFromEscalation(
         identity_revealed: shareIdentity,
         auto_alerted: false,
         status: "new",
-        recommended_action: "Faculty review and follow-up.",
+        recommended_action: "Counselor review and follow-up.",
         updated_at: new Date().toISOString(),
       })
       .eq("id", existing.id)
@@ -46,8 +46,8 @@ export async function createCaseFromEscalation(
     if (updateError) return { error: updateError.message };
     revalidatePath("/cases");
     revalidatePath("/dashboard");
-    revalidatePath("/faculty/alerts");
-    revalidatePath("/faculty/dashboard");
+    revalidatePath("/counselor/alerts");
+    revalidatePath("/counselor/dashboard");
     return { caseId: updated.id };
   }
 
@@ -66,7 +66,7 @@ export async function createCaseFromEscalation(
       others_affected: escalation.othersAffected,
       identity_revealed: shareIdentity,
       status: "new",
-      recommended_action: "Faculty review and follow-up.",
+      recommended_action: "Counselor review and follow-up.",
     })
     .select("id")
     .single();

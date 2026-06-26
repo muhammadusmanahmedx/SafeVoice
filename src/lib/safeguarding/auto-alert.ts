@@ -4,7 +4,7 @@ import type { RiskAssessment } from "@/types";
 
 type ServiceClient = SupabaseClient<Database>;
 
-export function shouldAutoAlertFaculty(assessment: RiskAssessment): boolean {
+export function shouldAutoAlertCounselor(assessment: RiskAssessment): boolean {
   return (
     assessment.riskLevel === "high" ||
     assessment.riskLevel === "critical" ||
@@ -21,7 +21,7 @@ export async function maybeCreateAutoAlert(
     assessment: RiskAssessment;
   }
 ): Promise<string | null> {
-  if (!shouldAutoAlertFaculty(params.assessment)) return null;
+  if (!shouldAutoAlertCounselor(params.assessment)) return null;
 
   const { data: existing } = await serviceClient
     .from("cases")

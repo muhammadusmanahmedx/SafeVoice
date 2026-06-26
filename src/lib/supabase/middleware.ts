@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
+import { isCounselorRole, normalizeRole } from "@/lib/auth/roles";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -30,10 +31,22 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
+
+  if (path.startsWith("/faculty")) {
+    const url = request.nextUrl.clone();
+    url.pathname = path.replace(/^\/faculty/, "/counselor");
+    return NextResponse.redirect(url);
+  }
+  if (path === "/faculty-register") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/counselor-register";
+    return NextResponse.redirect(url);
+  }
+
   const isAuthPage =
     path.startsWith("/login") ||
     path.startsWith("/register") ||
-    path.startsWith("/faculty-register");
+    path.startsWith("/counselor-register");
 
   if (!user && !isAuthPage && path !== "/" && path !== "/privacy") {
     const url = request.nextUrl.clone();
@@ -50,8 +63,9 @@ export async function updateSession(request: NextRequest) {
 
     if (profile?.role) {
       const url = request.nextUrl.clone();
-      if (profile.role === "faculty") url.pathname = "/faculty/dashboard";
-      else if (profile.role === "admin") url.pathname = "/admin/dashboard";
+      const role = normalizeRole(profile.role);
+      if (role === "counselor") url.pathname = "/counselor/dashboard";
+      else if (role === "admin") url.pathname = "/admin/dashboard";
       else url.pathname = "/dashboard";
       return NextResponse.redirect(url);
     }
@@ -74,7 +88,7 @@ export async function updateSession(request: NextRequest) {
 
     const role = profile.role;
 
-    if (path.startsWith("/faculty") && role !== "faculty" && role !== "admin") {
+    if (path.startsWith("/counselor") && !isCounselorRole(role) && role !== "admin") {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
@@ -82,14 +96,14 @@ export async function updateSession(request: NextRequest) {
 
     if (path.startsWith("/admin") && role !== "admin") {
       const url = request.nextUrl.clone();
-      url.pathname = role === "faculty" ? "/faculty/dashboard" : "/dashboard";
+      url.pathname = isCounselorRole(role) ? "/counselor/dashboard" : "/dashboard";
       return NextResponse.redirect(url);
     }
 
     const studentRoutes = ["/dashboard", "/chat", "/mood", "/resources", "/cases"];
     if (studentRoutes.some((r) => path.startsWith(r)) && role !== "student") {
       const url = request.nextUrl.clone();
-      url.pathname = role === "admin" ? "/admin/dashboard" : "/faculty/dashboard";
+      url.pathname = role === "admin" ? "/admin/dashboard" : "/counselor/dashboard";
       return NextResponse.redirect(url);
     }
   }

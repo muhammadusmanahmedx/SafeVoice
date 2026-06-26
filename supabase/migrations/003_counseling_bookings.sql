@@ -5,14 +5,14 @@ CREATE TYPE booking_status AS ENUM ('booked', 'cancelled', 'completed');
 CREATE TABLE counseling_slots (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   institution_id UUID NOT NULL REFERENCES institutions(id) ON DELETE CASCADE,
-  faculty_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  counselor_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   slot_at TIMESTAMPTZ NOT NULL,
   duration_minutes SMALLINT NOT NULL DEFAULT 30,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX idx_counseling_slots_institution ON counseling_slots(institution_id);
-CREATE INDEX idx_counseling_slots_faculty ON counseling_slots(faculty_id);
+CREATE INDEX idx_counseling_slots_faculty ON counseling_slots(counselor_id);
 CREATE INDEX idx_counseling_slots_slot_at ON counseling_slots(slot_at);
 
 CREATE TABLE counseling_bookings (
@@ -37,21 +37,21 @@ CREATE POLICY "Users view institution counseling slots"
   ON counseling_slots FOR SELECT
   USING (institution_id = get_user_institution_id());
 
-CREATE POLICY "Faculty create own counseling slots"
+CREATE POLICY "Counselor create own counseling slots"
   ON counseling_slots FOR INSERT
   WITH CHECK (
-    faculty_id = auth.uid()
+    counselor_id = auth.uid()
     AND institution_id = get_user_institution_id()
-    AND get_user_role() IN ('faculty', 'admin')
+    AND get_user_role() IN ('counselor', 'admin')
   );
 
-CREATE POLICY "Faculty update own counseling slots"
+CREATE POLICY "Counselor update own counseling slots"
   ON counseling_slots FOR UPDATE
-  USING (faculty_id = auth.uid());
+  USING (counselor_id = auth.uid());
 
-CREATE POLICY "Faculty delete own counseling slots"
+CREATE POLICY "Counselor delete own counseling slots"
   ON counseling_slots FOR DELETE
-  USING (faculty_id = auth.uid());
+  USING (counselor_id = auth.uid());
 
 CREATE POLICY "Admins manage institution counseling slots"
   ON counseling_slots FOR ALL
@@ -76,13 +76,13 @@ CREATE POLICY "Students cancel own counseling bookings"
   ON counseling_bookings FOR UPDATE
   USING (student_id = auth.uid());
 
--- Faculty view bookings on their slots
-CREATE POLICY "Faculty view counseling bookings on their slots"
+-- Counselor view bookings on their slots
+CREATE POLICY "Counselor view counseling bookings on their slots"
   ON counseling_bookings FOR SELECT
   USING (
     institution_id = get_user_institution_id()
-    AND get_user_role() IN ('faculty', 'admin')
-    AND slot_id IN (SELECT id FROM counseling_slots WHERE faculty_id = auth.uid())
+    AND get_user_role() IN ('counselor', 'admin')
+    AND slot_id IN (SELECT id FROM counseling_slots WHERE counselor_id = auth.uid())
   );
 
 GRANT ALL ON counseling_slots TO anon, authenticated, service_role;

@@ -84,8 +84,8 @@ export function StudentCaseDetail({ caseData, messages, revealRequest }: CaseDet
               )}
             >
               <p className="mb-1 text-xs font-medium capitalize text-muted-foreground">
-                {msg.sender_role === "faculty"
-                  ? t("student.cases.detail.facultyResponse")
+                {msg.sender_role === "counselor"
+                  ? t("student.cases.detail.counselorResponse")
                   : t("student.cases.detail.you")}
               </p>
               {msg.content}

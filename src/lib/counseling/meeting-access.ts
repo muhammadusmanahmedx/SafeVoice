@@ -14,7 +14,7 @@ function runtimeTimeZone(): string {
 
 /**
  * Joinable for the entire scheduled calendar day in the user's timezone.
- * No 15-minute early window — both student and faculty can join any time that day.
+ * No 15-minute early window — both student and counselor can join any time that day.
  */
 export function canJoinSession(
   slotAt: string | Date,

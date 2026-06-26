@@ -57,7 +57,7 @@ export async function GET(request: Request) {
     const { data: msgs } = await supabase
       .from("case_messages")
       .select("id, content, created_at, case_id")
-      .eq("sender_role", "faculty")
+      .eq("sender_role", "counselor")
       .in(
         "case_id",
         (
@@ -74,7 +74,7 @@ export async function GET(request: Request) {
       notifications.push({
         id: `msg-${m.id}`,
         type: "message",
-        title: t("notifications.student.facultyRepliedTitle"),
+        title: t("notifications.student.counselorRepliedTitle"),
         body: m.content.slice(0, 80) + (m.content.length > 80 ? "…" : ""),
         time: formatDate(m.created_at),
         read: false,
@@ -135,7 +135,7 @@ export async function GET(request: Request) {
     }
   }
 
-  if (profile.role === "faculty" || profile.role === "admin") {
+  if (profile.role === "counselor" || profile.role === "admin") {
     const { data: newCases } = await supabase
       .from("anonymous_cases" as "cases")
       .select("id, incident_type, severity, created_at, auto_alerted")
@@ -151,17 +151,17 @@ export async function GET(request: Request) {
         id: `case-${c.id}`,
         type: autoAlerted ? "risk_alert" : "new_case",
         title: autoAlerted
-          ? t("notifications.faculty.highRiskAlertTitle")
-          : t("notifications.faculty.newCaseTitle"),
+          ? t("notifications.counselor.highRiskAlertTitle")
+          : t("notifications.counselor.newCaseTitle"),
         body: autoAlerted
-          ? formatMessage(t("notifications.faculty.highRiskAlertBody"), { incidentType: incidentLabel })
-          : formatMessage(t("notifications.faculty.newCaseBody"), {
+          ? formatMessage(t("notifications.counselor.highRiskAlertBody"), { incidentType: incidentLabel })
+          : formatMessage(t("notifications.counselor.newCaseBody"), {
               incidentType: incidentLabel,
               severity: getRiskLevelLabel(t, c.severity),
             }),
         time: formatDate(c.created_at),
         read: false,
-        href: `/faculty/cases/${c.id}`,
+        href: `/counselor/cases/${c.id}`,
       });
     }
 
@@ -185,18 +185,18 @@ export async function GET(request: Request) {
       notifications.push({
         id: `smsg-${m.id}`,
         type: "message",
-        title: t("notifications.faculty.studentRepliedTitle"),
+        title: t("notifications.counselor.studentRepliedTitle"),
         body: m.content.slice(0, 80) + (m.content.length > 80 ? "…" : ""),
         time: formatDate(m.created_at),
         read: false,
-        href: `/faculty/cases/${m.case_id}`,
+        href: `/counselor/cases/${m.case_id}`,
       });
     }
 
     const { data: mySlots } = await supabase
       .from("counseling_slots")
       .select("id")
-      .eq("faculty_id", profile.id);
+      .eq("counselor_id", profile.id);
 
     const mySlotIds = (mySlots ?? []).map((s) => s.id);
     if (mySlotIds.length > 0) {
@@ -213,15 +213,15 @@ export async function GET(request: Request) {
         notifications.push({
           id: `fbkg-${b.id}`,
           type: "counseling_booking_received",
-          title: t("notifications.faculty.newBookingTitle"),
+          title: t("notifications.counselor.newBookingTitle"),
           body: slot
-            ? formatMessage(t("notifications.faculty.newBookingBody"), {
+            ? formatMessage(t("notifications.counselor.newBookingBody"), {
                 datetime: formatSlotDateTime(slot.slot_at, locale),
               })
-            : t("notifications.faculty.newBookingBodyFallback"),
+            : t("notifications.counselor.newBookingBodyFallback"),
           time: formatDate(b.created_at),
           read: false,
-          href: "/faculty/counseling",
+          href: "/counselor/counseling",
         });
       }
     }
@@ -240,14 +240,14 @@ export async function GET(request: Request) {
         id: `rresp-${r.id}`,
         type: accepted ? "identity_accepted" : "identity_declined",
         title: accepted
-          ? t("notifications.faculty.identityAcceptedTitle")
-          : t("notifications.faculty.identityDeclinedTitle"),
+          ? t("notifications.counselor.identityAcceptedTitle")
+          : t("notifications.counselor.identityDeclinedTitle"),
         body: accepted
-          ? t("notifications.faculty.identityAcceptedBody")
-          : t("notifications.faculty.identityDeclinedBody"),
+          ? t("notifications.counselor.identityAcceptedBody")
+          : t("notifications.counselor.identityDeclinedBody"),
         time: formatDate(r.responded_at!),
         read: false,
-        href: `/faculty/cases/${r.case_id}`,
+        href: `/counselor/cases/${r.case_id}`,
       });
     }
   }

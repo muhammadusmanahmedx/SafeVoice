@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { UserRole } from "@/types";
 import type { Tables } from "@/types/database";
+import { normalizeRole, roleMatches } from "@/lib/auth/roles";
 
 export type ProfileWithInstitution = Tables<"profiles"> & {
   institutions: Tables<"institutions"> | null;
@@ -30,30 +31,31 @@ export async function requireProfile(allowedRoles?: UserRole[]): Promise<Profile
     redirect("/login");
     throw new Error("Unauthorized");
   }
-  if (allowedRoles && !allowedRoles.includes(profile.role as UserRole)) {
-    if (profile.role === "admin") redirect("/admin/dashboard");
-    if (profile.role === "faculty") redirect("/faculty/dashboard");
+  if (allowedRoles && !roleMatches(profile.role, allowedRoles)) {
+    const role = normalizeRole(profile.role);
+    if (role === "admin") redirect("/admin/dashboard");
+    if (role === "counselor") redirect("/counselor/dashboard");
     redirect("/dashboard");
     throw new Error("Forbidden");
   }
-  return profile;
+  return { ...profile, role: normalizeRole(profile.role) as UserRole } as ProfileWithInstitution;
 }
 
 export async function requireApiProfile(allowedRoles?: UserRole[]) {
   const profile = await getProfile();
   if (!profile) return { error: "Unauthorized", status: 401 as const };
-  if (allowedRoles && !allowedRoles.includes(profile.role as UserRole)) {
+  if (allowedRoles && !roleMatches(profile.role, allowedRoles)) {
     return { error: "Forbidden", status: 403 as const };
   }
-  return { profile };
+  return { profile: { ...profile, role: normalizeRole(profile.role) } as ProfileWithInstitution };
 }
 
 export function getRoleDashboard(role: UserRole) {
   switch (role) {
     case "admin":
       return "/admin/dashboard";
-    case "faculty":
-      return "/faculty/dashboard";
+    case "counselor":
+      return "/counselor/dashboard";
     default:
       return "/dashboard";
   }

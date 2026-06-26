@@ -7,39 +7,42 @@ import { StatusBar, Style } from "@capacitor/status-bar";
 import { Capacitor } from "@capacitor/core";
 import { isNativeApp } from "@/lib/capacitor/is-native";
 
+async function hideSplash() {
+  try {
+    await SplashScreen.hide();
+  } catch {
+    // ignore
+  }
+}
+
 export function NativeShellInit() {
   useEffect(() => {
     if (!isNativeApp()) return;
 
     const platform = Capacitor.getPlatform();
 
+    void hideSplash();
+    const splashFallback = window.setTimeout(() => {
+      void hideSplash();
+    }, 2500);
+
     void (async () => {
       try {
-        // "Dark" style = white icons, for our navy (#193852) status bar.
         await StatusBar.setStyle({ style: Style.Dark });
 
         if (platform === "android") {
-          // Android reserves a solid navy bar; WebView sits below it.
           await StatusBar.setBackgroundColor({ color: "#193852" });
           await StatusBar.setOverlaysWebView({ overlay: false });
         } else if (platform === "ios") {
-          // iOS always floats the status bar over content; let the WebView go
-          // edge-to-edge and our StatusBarBackdrop strip + safe-area padding
-          // handle the navy backdrop and spacing.
           await StatusBar.setOverlaysWebView({ overlay: true });
         }
       } catch {
-        // StatusBar plugin unavailable (e.g. web preview)
+        // StatusBar plugin unavailable
       }
 
-      try {
-        await SplashScreen.hide();
-      } catch {
-        // ignore
-      }
+      await hideSplash();
     })();
 
-    // Android hardware back button
     const backListenerPromise = App.addListener("backButton", ({ canGoBack }) => {
       if (canGoBack) {
         window.history.back();
@@ -49,6 +52,7 @@ export function NativeShellInit() {
     });
 
     return () => {
+      window.clearTimeout(splashFallback);
       void backListenerPromise.then((l) => l.remove());
     };
   }, []);

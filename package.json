@@ -9,9 +9,12 @@
     "lint": "next lint",
     "db:check": "node scripts/check-db.mjs",
     "db:migrate": "node scripts/run-migration.mjs",
+    "db:fix-schema": "node scripts/run-sql.mjs 008_ensure_counselor_weekly_availability.sql",
+    "db:sync-slots": "node scripts/sync-counselor-slots.mjs",
     "db:seed-users": "node scripts/seed-users.mjs",
     "db:setup": "node scripts/run-migration.mjs && node scripts/seed-users.mjs",
-    "cap:sync": "npx cap sync",
+    "cap:sync": "node scripts/generate-capacitor-shell.mjs && npx cap sync",
+    "cap:copy-apk": "node scripts/copy-apk.mjs",
     "cap:android": "npx cap open android",
     "cap:ios": "npx cap open ios"
   },

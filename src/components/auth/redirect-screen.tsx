@@ -9,8 +9,8 @@ export function RedirectScreen({ role }: { role: string }) {
   const label =
     role === "admin"
       ? t("portal.admin")
-      : role === "faculty"
-        ? t("portal.faculty")
+      : role === "counselor"
+        ? t("portal.counselor")
         : t("portal.student");
 
   return (

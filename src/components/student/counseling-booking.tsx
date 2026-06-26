@@ -50,7 +50,7 @@ import {
 
 export interface CounselingSlot {
   id: string;
-  faculty_id: string;
+  counselor_id: string;
   counselor_name: string;
   slot_at: string;
   duration_minutes: number;
@@ -393,7 +393,7 @@ export function CounselingBookingPanel({
                   </div>
                 )}
 
-                {/* Step 1: faculty time frames (e.g. 9–11, 2–5) */}
+                {/* Step 1: counselor time frames (e.g. 9–11, 2–5) */}
                 {selectedDate &&
                   !selectedFrameId &&
                   framesForDay.map((frame) => (

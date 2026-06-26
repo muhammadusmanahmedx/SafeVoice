@@ -4,7 +4,7 @@ ALTER TABLE cases
   ADD COLUMN IF NOT EXISTS identity_revealed BOOLEAN NOT NULL DEFAULT false,
   ADD COLUMN IF NOT EXISTS auto_alerted BOOLEAN NOT NULL DEFAULT false;
 
--- Recreate anonymous view (excludes student_id; includes new flags for faculty UI)
+-- Recreate anonymous view (excludes student_id; includes new flags for counselor UI)
 DROP VIEW IF EXISTS anonymous_cases;
 CREATE VIEW anonymous_cases AS
 SELECT

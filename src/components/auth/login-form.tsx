@@ -28,8 +28,8 @@ export function LoginForm() {
     if (result?.redirectTo) {
       const role = result.redirectTo.startsWith("/admin")
         ? "admin"
-        : result.redirectTo.startsWith("/faculty")
-        ? "faculty"
+        : result.redirectTo.startsWith("/counselor")
+        ? "counselor"
         : "student";
       setRedirectRole(role);
       // Hard navigation (with a short commit delay in the native WebView)
@@ -91,8 +91,8 @@ export function LoginForm() {
           <Link href="/register" className="font-semibold text-[#193852] hover:underline">{t("auth.createAccount")}</Link>
         </p>
         <p>
-          {t("auth.facultyQuestion")}{" "}
-          <Link href="/faculty-register" className="font-semibold text-[#193852] hover:underline">{t("auth.registerWithCode")}</Link>
+          {t("auth.counselorQuestion")}{" "}
+          <Link href="/counselor-register" className="font-semibold text-[#193852] hover:underline">{t("auth.registerWithCode")}</Link>
         </p>
       </div>
     </div>

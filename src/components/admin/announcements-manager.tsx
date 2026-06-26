@@ -47,7 +47,7 @@ export function AnnouncementsManager({ announcements }: AnnouncementsManagerProp
           <Textarea id="content" value={content} onChange={(e) => setContent(e.target.value)} rows={4} />
         </div>
         <Button onClick={handleCreate} disabled={loading}>
-          {loading ? t("admin.announcements.publishing") : t("admin.announcements.publishToFaculty")}
+          {loading ? t("admin.announcements.publishing") : t("admin.announcements.publishToCounselors")}
         </Button>
       </div>
 

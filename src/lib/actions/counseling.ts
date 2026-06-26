@@ -16,13 +16,13 @@ import {
 export type { TimeRange, WeeklySchedule };
 
 export async function getWeeklyAvailability() {
-  const profile = await requireProfile(["faculty", "admin"]);
+  const profile = await requireProfile(["counselor", "admin"]);
   const supabase = await createClient();
 
   const { data } = await supabase
-    .from("faculty_weekly_availability")
+    .from("counselor_weekly_availability")
     .select("day_of_week, start_time, end_time, duration_minutes")
-    .eq("faculty_id", profile.id)
+    .eq("counselor_id", profile.id)
     .order("day_of_week")
     .order("start_time");
 
@@ -34,7 +34,7 @@ export async function saveWeeklyAvailability(
   schedule: WeeklySchedule,
   durationMinutes: number
 ) {
-  const profile = await requireProfile(["faculty", "admin"]);
+  const profile = await requireProfile(["counselor", "admin"]);
   const supabase = await createClient();
 
   if (![30, 45, 60].includes(durationMinutes)) {
@@ -57,15 +57,15 @@ export async function saveWeeklyAvailability(
   }
 
   await supabase
-    .from("faculty_weekly_availability")
+    .from("counselor_weekly_availability")
     .delete()
-    .eq("faculty_id", profile.id);
+    .eq("counselor_id", profile.id);
 
   const inserts = [];
   for (let day = 0; day <= 6; day++) {
     for (const range of schedule[day] ?? []) {
       inserts.push({
-        faculty_id: profile.id,
+        counselor_id: profile.id,
         institution_id: profile.institution_id,
         day_of_week: day,
         start_time: range.start,
@@ -76,7 +76,7 @@ export async function saveWeeklyAvailability(
   }
 
   if (inserts.length > 0) {
-    const { error } = await supabase.from("faculty_weekly_availability").insert(inserts);
+    const { error } = await supabase.from("counselor_weekly_availability").insert(inserts);
     if (error) return { error: error.message };
   }
 
@@ -88,13 +88,13 @@ export async function saveWeeklyAvailability(
   );
   if (syncResult.error) return syncResult;
 
-  revalidatePath("/faculty/counseling");
+  revalidatePath("/counselor/counseling");
   revalidatePath("/counseling");
   return { success: true };
 }
 
 async function syncCounselingSlotsFromWeekly(
-  facultyId: string,
+  counselorId: string,
   institutionId: string,
   schedule: WeeklySchedule,
   durationMinutes: number
@@ -105,7 +105,7 @@ async function syncCounselingSlotsFromWeekly(
   const { data: existingSlots } = await supabase
     .from("counseling_slots")
     .select("id, slot_at")
-    .eq("faculty_id", facultyId)
+    .eq("counselor_id", counselorId)
     .gte("slot_at", now);
 
   const slotIds = (existingSlots ?? []).map((s) => s.id);
@@ -138,7 +138,7 @@ async function syncCounselingSlotsFromWeekly(
     .filter((t) => !bookedSlotTimes.has(t.toISOString()))
     .map((t) => ({
       institution_id: institutionId,
-      faculty_id: facultyId,
+      counselor_id: counselorId,
       slot_at: t.toISOString(),
       duration_minutes: durationMinutes,
     }));
@@ -197,30 +197,30 @@ export async function bookCounselingSession(slotId: string, topic?: string) {
     .eq("id", data.id);
 
   revalidatePath("/counseling");
-  revalidatePath("/faculty/counseling");
+  revalidatePath("/counselor/counseling");
   revalidatePath("/dashboard");
   return { bookingId: data.id };
 }
 
 export async function completeCounselingSession(bookingId: string) {
-  const profile = await requireProfile(["student", "faculty", "admin"]);
+  const profile = await requireProfile(["student", "counselor", "admin"]);
   const supabase = await createClient();
 
   const { data: booking } = await supabase
     .from("counseling_bookings")
-    .select("id, student_id, slot:counseling_slots(faculty_id)")
+    .select("id, student_id, slot:counseling_slots(counselor_id)")
     .eq("id", bookingId)
     .single();
 
   if (!booking) return { error: "Booking not found." };
 
-  const slot = booking.slot as { faculty_id: string } | null;
+  const slot = booking.slot as { counselor_id: string } | null;
   const isStudent = profile.role === "student" && booking.student_id === profile.id;
-  const isFaculty =
-    (profile.role === "faculty" || profile.role === "admin") &&
-    slot?.faculty_id === profile.id;
+  const isCounselor =
+    (profile.role === "counselor" || profile.role === "admin") &&
+    slot?.counselor_id === profile.id;
 
-  if (!isStudent && !isFaculty) return { error: "Unauthorized." };
+  if (!isStudent && !isCounselor) return { error: "Unauthorized." };
 
   await supabase
     .from("counseling_bookings")
@@ -228,7 +228,7 @@ export async function completeCounselingSession(bookingId: string) {
     .eq("id", bookingId);
 
   revalidatePath("/counseling");
-  revalidatePath("/faculty/counseling");
+  revalidatePath("/counselor/counseling");
   return { success: true };
 }
 
@@ -246,7 +246,7 @@ export async function cancelCounselingBooking(bookingId: string) {
   if (error) return { error: error.message };
 
   revalidatePath("/counseling");
-  revalidatePath("/faculty/counseling");
+  revalidatePath("/counselor/counseling");
   revalidatePath("/dashboard");
   return { success: true };
 }

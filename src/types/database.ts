@@ -37,7 +37,7 @@ export type Database = {
         Row: {
           id: string;
           institution_id: string;
-          role: "student" | "faculty" | "admin";
+          role: "student" | "counselor" | "admin";
           display_name: string | null;
           avatar_url: string | null;
           is_active: boolean;
@@ -46,7 +46,7 @@ export type Database = {
         Insert: {
           id: string;
           institution_id: string;
-          role?: "student" | "faculty" | "admin";
+          role?: "student" | "counselor" | "admin";
           display_name?: string | null;
           avatar_url?: string | null;
           is_active?: boolean;
@@ -55,7 +55,7 @@ export type Database = {
         Update: {
           id?: string;
           institution_id?: string;
-          role?: "student" | "faculty" | "admin";
+          role?: "student" | "counselor" | "admin";
           display_name?: string | null;
           avatar_url?: string | null;
           is_active?: boolean;
@@ -78,7 +78,7 @@ export type Database = {
           },
         ];
       };
-      faculty_codes: {
+      counselor_codes: {
         Row: {
           id: string;
           institution_id: string;
@@ -111,7 +111,7 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "faculty_codes_institution_id_fkey";
+            foreignKeyName: "counselor_codes_institution_id_fkey";
             columns: ["institution_id"];
             isOneToOne: false;
             referencedRelation: "institutions";
@@ -241,7 +241,7 @@ export type Database = {
           summary: string;
           location: string | null;
           duration: string | null;
-          people_involved: "student" | "faculty" | "group" | "unknown" | null;
+          people_involved: "student" | "counselor" | "group" | "unknown" | null;
           others_affected: boolean | null;
           status: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated";
           recommended_action: string | null;
@@ -260,7 +260,7 @@ export type Database = {
           summary: string;
           location?: string | null;
           duration?: string | null;
-          people_involved?: "student" | "faculty" | "group" | "unknown" | null;
+          people_involved?: "student" | "counselor" | "group" | "unknown" | null;
           others_affected?: boolean | null;
           status?: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated";
           recommended_action?: string | null;
@@ -279,7 +279,7 @@ export type Database = {
           summary?: string;
           location?: string | null;
           duration?: string | null;
-          people_involved?: "student" | "faculty" | "group" | "unknown" | null;
+          people_involved?: "student" | "counselor" | "group" | "unknown" | null;
           others_affected?: boolean | null;
           status?: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated";
           recommended_action?: string | null;
@@ -302,21 +302,21 @@ export type Database = {
         Row: {
           id: string;
           case_id: string;
-          sender_role: "student" | "faculty";
+          sender_role: "student" | "counselor";
           content: string;
           created_at: string;
         };
         Insert: {
           id?: string;
           case_id: string;
-          sender_role: "student" | "faculty";
+          sender_role: "student" | "counselor";
           content: string;
           created_at?: string;
         };
         Update: {
           id?: string;
           case_id?: string;
-          sender_role?: "student" | "faculty";
+          sender_role?: "student" | "counselor";
           content?: string;
           created_at?: string;
         };
@@ -513,7 +513,7 @@ export type Database = {
         Row: {
           id: string;
           institution_id: string;
-          faculty_id: string;
+          counselor_id: string;
           slot_at: string;
           duration_minutes: number;
           created_at: string;
@@ -521,7 +521,7 @@ export type Database = {
         Insert: {
           id?: string;
           institution_id: string;
-          faculty_id: string;
+          counselor_id: string;
           slot_at: string;
           duration_minutes?: number;
           created_at?: string;
@@ -529,7 +529,7 @@ export type Database = {
         Update: {
           id?: string;
           institution_id?: string;
-          faculty_id?: string;
+          counselor_id?: string;
           slot_at?: string;
           duration_minutes?: number;
           created_at?: string;
@@ -543,8 +543,8 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "counseling_slots_faculty_id_fkey";
-            columns: ["faculty_id"];
+            foreignKeyName: "counseling_slots_counselor_id_fkey";
+            columns: ["counselor_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -605,10 +605,10 @@ export type Database = {
           },
         ];
       };
-      faculty_weekly_availability: {
+      counselor_weekly_availability: {
         Row: {
           id: string;
-          faculty_id: string;
+          counselor_id: string;
           institution_id: string;
           day_of_week: number;
           start_time: string;
@@ -618,7 +618,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
-          faculty_id: string;
+          counselor_id: string;
           institution_id: string;
           day_of_week: number;
           start_time: string;
@@ -628,7 +628,7 @@ export type Database = {
         };
         Update: {
           id?: string;
-          faculty_id?: string;
+          counselor_id?: string;
           institution_id?: string;
           day_of_week?: number;
           start_time?: string;
@@ -638,8 +638,8 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "faculty_weekly_availability_faculty_id_fkey";
-            columns: ["faculty_id"];
+            foreignKeyName: "counselor_weekly_availability_counselor_id_fkey";
+            columns: ["counselor_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -658,7 +658,7 @@ export type Database = {
           summary: string;
           location: string | null;
           duration: string | null;
-          people_involved: "student" | "faculty" | "group" | "unknown" | null;
+          people_involved: "student" | "counselor" | "group" | "unknown" | null;
           others_affected: boolean | null;
           status: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated";
           recommended_action: string | null;
@@ -672,7 +672,7 @@ export type Database = {
     };
     Functions: Record<string, never>;
     Enums: {
-      user_role: "student" | "faculty" | "admin";
+      user_role: "student" | "counselor" | "admin";
       risk_level: "low" | "medium" | "high" | "critical";
       case_status: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated";
       resource_type: "article" | "video" | "helpline" | "institution";

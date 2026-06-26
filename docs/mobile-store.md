@@ -37,5 +37,5 @@ Requires Mac with Xcode.
 3. AI chat send/receive
 4. Book counseling session
 5. Join Jitsi video (camera + mic work)
-6. Faculty login → join same session
+6. Counselor login → join same session
 7. Android hardware back button navigates history

@@ -7,7 +7,7 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Enums
-CREATE TYPE user_role AS ENUM ('student', 'faculty', 'admin');
+CREATE TYPE user_role AS ENUM ('student', 'counselor', 'admin');
 CREATE TYPE message_role AS ENUM ('user', 'assistant');
 CREATE TYPE risk_level AS ENUM ('low', 'medium', 'high', 'critical');
 CREATE TYPE risk_category AS ENUM (
@@ -15,8 +15,8 @@ CREATE TYPE risk_category AS ENUM (
   'mental_health', 'safety_concern', 'discrimination', 'other'
 );
 CREATE TYPE case_status AS ENUM ('new', 'in_progress', 'escalated', 'resolved', 'unsubstantiated');
-CREATE TYPE people_involved AS ENUM ('student', 'faculty', 'group', 'unknown');
-CREATE TYPE sender_role AS ENUM ('student', 'faculty');
+CREATE TYPE people_involved AS ENUM ('student', 'counselor', 'group', 'unknown');
+CREATE TYPE sender_role AS ENUM ('student', 'counselor');
 CREATE TYPE reveal_status AS ENUM ('pending', 'accepted', 'declined');
 CREATE TYPE resource_type AS ENUM ('article', 'video', 'helpline', 'institution');
 
@@ -43,8 +43,8 @@ CREATE TABLE profiles (
 CREATE INDEX idx_profiles_institution ON profiles(institution_id);
 CREATE INDEX idx_profiles_role ON profiles(role);
 
--- Faculty registration codes
-CREATE TABLE faculty_codes (
+-- Counselor registration codes
+CREATE TABLE counselor_codes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   institution_id UUID NOT NULL REFERENCES institutions(id) ON DELETE CASCADE,
   code TEXT NOT NULL,
@@ -109,7 +109,7 @@ CREATE TABLE cases (
   people_involved people_involved DEFAULT 'unknown',
   others_affected BOOLEAN DEFAULT false,
   status case_status NOT NULL DEFAULT 'new',
-  recommended_action TEXT DEFAULT 'Faculty review and follow-up.',
+  recommended_action TEXT DEFAULT 'Counselor review and follow-up.',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -118,7 +118,7 @@ CREATE INDEX idx_cases_institution ON cases(institution_id);
 CREATE INDEX idx_cases_status ON cases(status);
 CREATE INDEX idx_cases_location ON cases(location);
 
--- Anonymous cases view (no student_id for faculty)
+-- Anonymous cases view (no student_id for counselor)
 CREATE VIEW anonymous_cases AS
 SELECT
   id,
@@ -239,7 +239,7 @@ CREATE TRIGGER cases_updated_at
 -- Enable RLS
 ALTER TABLE institutions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE faculty_codes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE counselor_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE risk_assessments ENABLE ROW LEVEL SECURITY;
@@ -281,21 +281,21 @@ CREATE POLICY "Admins manage profiles in institution"
     AND get_user_role() = 'admin'
   );
 
--- Faculty codes
-CREATE POLICY "Admins manage faculty codes"
-  ON faculty_codes FOR ALL
+-- Counselor codes
+CREATE POLICY "Admins manage counselor codes"
+  ON counselor_codes FOR ALL
   USING (
     institution_id = get_user_institution_id()
     AND get_user_role() = 'admin'
   );
 
-CREATE POLICY "Anyone can validate faculty codes"
-  ON faculty_codes FOR SELECT
+CREATE POLICY "Anyone can validate counselor codes"
+  ON counselor_codes FOR SELECT
   TO anon, authenticated
   USING (used_by IS NULL AND (expires_at IS NULL OR expires_at > now()));
 
-CREATE POLICY "Users can redeem faculty codes"
-  ON faculty_codes FOR UPDATE
+CREATE POLICY "Users can redeem counselor codes"
+  ON counselor_codes FOR UPDATE
   TO authenticated
   USING (used_by IS NULL AND (expires_at IS NULL OR expires_at > now()))
   WITH CHECK (used_by = auth.uid());
@@ -316,11 +316,11 @@ CREATE POLICY "Students manage own conversations"
   ON conversations FOR ALL
   USING (student_id = auth.uid());
 
-CREATE POLICY "Faculty view institution conversations metadata"
+CREATE POLICY "Counselor view institution conversations metadata"
   ON conversations FOR SELECT
   USING (
     institution_id = get_user_institution_id()
-    AND get_user_role() IN ('faculty', 'admin')
+    AND get_user_role() IN ('counselor', 'admin')
   );
 
 -- Messages
@@ -341,30 +341,30 @@ CREATE POLICY "Students view own risk assessments"
     )
   );
 
-CREATE POLICY "Faculty view institution risk assessments"
+CREATE POLICY "Counselor view institution risk assessments"
   ON risk_assessments FOR SELECT
   USING (
     institution_id = get_user_institution_id()
-    AND get_user_role() IN ('faculty', 'admin')
+    AND get_user_role() IN ('counselor', 'admin')
   );
 
--- Cases - students see own, faculty see via anonymous view pattern
+-- Cases - students see own, counselor see via anonymous view pattern
 CREATE POLICY "Students manage own cases"
   ON cases FOR ALL
   USING (student_id = auth.uid());
 
-CREATE POLICY "Faculty view institution cases"
+CREATE POLICY "Counselor view institution cases"
   ON cases FOR SELECT
   USING (
     institution_id = get_user_institution_id()
-    AND get_user_role() IN ('faculty', 'admin')
+    AND get_user_role() IN ('counselor', 'admin')
   );
 
-CREATE POLICY "Faculty update institution cases"
+CREATE POLICY "Counselor update institution cases"
   ON cases FOR UPDATE
   USING (
     institution_id = get_user_institution_id()
-    AND get_user_role() IN ('faculty', 'admin')
+    AND get_user_role() IN ('counselor', 'admin')
   );
 
 -- Case messages
@@ -374,25 +374,25 @@ CREATE POLICY "Students read/write case messages for own cases"
     case_id IN (SELECT id FROM cases WHERE student_id = auth.uid())
   );
 
-CREATE POLICY "Faculty manage case messages in institution"
+CREATE POLICY "Counselor manage case messages in institution"
   ON case_messages FOR ALL
   USING (
     case_id IN (
       SELECT id FROM cases
       WHERE institution_id = get_user_institution_id()
     )
-    AND get_user_role() IN ('faculty', 'admin')
+    AND get_user_role() IN ('counselor', 'admin')
   );
 
 -- Case notes
-CREATE POLICY "Faculty manage case notes"
+CREATE POLICY "Counselor manage case notes"
   ON case_notes FOR ALL
   USING (
     case_id IN (
       SELECT id FROM cases
       WHERE institution_id = get_user_institution_id()
     )
-    AND get_user_role() IN ('faculty', 'admin')
+    AND get_user_role() IN ('counselor', 'admin')
   );
 
 -- Identity reveal
@@ -408,21 +408,21 @@ CREATE POLICY "Students update reveal requests"
     case_id IN (SELECT id FROM cases WHERE student_id = auth.uid())
   );
 
-CREATE POLICY "Faculty create reveal requests"
+CREATE POLICY "Counselor create reveal requests"
   ON identity_reveal_requests FOR INSERT
   WITH CHECK (
     requested_by = auth.uid()
-    AND get_user_role() IN ('faculty', 'admin')
+    AND get_user_role() IN ('counselor', 'admin')
   );
 
-CREATE POLICY "Faculty view reveal requests"
+CREATE POLICY "Counselor view reveal requests"
   ON identity_reveal_requests FOR SELECT
   USING (
     case_id IN (
       SELECT id FROM cases
       WHERE institution_id = get_user_institution_id()
     )
-    AND get_user_role() IN ('faculty', 'admin')
+    AND get_user_role() IN ('counselor', 'admin')
   );
 
 -- Mood logs
@@ -459,11 +459,11 @@ CREATE POLICY "Anyone can view global resources"
   USING (is_global = true);
 
 -- Announcements
-CREATE POLICY "Faculty and admins view announcements"
+CREATE POLICY "Counselor and admins view announcements"
   ON announcements FOR SELECT
   USING (
     institution_id = get_user_institution_id()
-    AND get_user_role() IN ('faculty', 'admin')
+    AND get_user_role() IN ('counselor', 'admin')
   );
 
 CREATE POLICY "Admins manage announcements"
@@ -523,8 +523,8 @@ INSERT INTO resources (institution_id, category, title, description, type, url, 
   ('11111111-1111-1111-1111-111111111111', 'anxiety', 'Riverside Peer Support Group', 'Weekly peer support meetings', 'institution', 'https://riverside.edu/peer-support', false),
   ('22222222-2222-2222-2222-222222222222', 'institution', 'Northfield Wellbeing Hub', 'Student wellbeing services', 'institution', 'https://northfield.edu/wellbeing', false);
 
--- Faculty registration codes (for demo â€” use in faculty registration)
-INSERT INTO faculty_codes (institution_id, code, expires_at) VALUES
+-- Counselor registration codes (for demo â€” use in counselor registration)
+INSERT INTO counselor_codes (institution_id, code, expires_at) VALUES
   ('11111111-1111-1111-1111-111111111111', 'FAC-DEMO-RV001', now() + interval '365 days'),
   ('22222222-2222-2222-2222-222222222222', 'FAC-DEMO-NF001', now() + interval '365 days');
 

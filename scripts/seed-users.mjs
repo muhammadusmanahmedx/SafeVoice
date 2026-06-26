@@ -16,10 +16,10 @@ const USERS = [
     institution_id: RIVERSIDE_ID,
   },
   {
-    email: "faculty@riverside.demo",
+    email: "counselor@riverside.demo",
     password: DEMO_PASSWORD,
-    role: "faculty",
-    display_name: "Demo Faculty",
+    role: "counselor",
+    display_name: "Demo Counselor",
     institution_id: RIVERSIDE_ID,
   },
   {
@@ -76,22 +76,32 @@ async function main() {
 
     if (!userId) continue;
 
-    const { error: profileError } = await supabase.from("profiles").upsert(
-      {
-        id: userId,
-        institution_id: user.institution_id,
-        role: user.role,
-        display_name: user.display_name,
-        is_active: true,
-      },
-      { onConflict: "id" }
-    );
+    const rolesToTry = [user.role];
 
-    if (profileError) {
-      console.error(`Failed profile for ${user.email}:`, profileError.message);
-    } else {
-      console.log(`Profile ready: ${user.email} (${user.role})\n`);
+    let profileOk = false;
+    for (const role of rolesToTry) {
+      const { error: profileError } = await supabase.from("profiles").upsert(
+        {
+          id: userId,
+          institution_id: user.institution_id,
+          role,
+          display_name: user.display_name,
+          is_active: true,
+        },
+        { onConflict: "id" }
+      );
+
+      if (!profileError) {
+        console.log(`Profile ready: ${user.email} (${role})\n`);
+        profileOk = true;
+        break;
+      }
+      if (role === rolesToTry[rolesToTry.length - 1]) {
+        console.error(`Failed profile for ${user.email}:`, profileError.message);
+      }
     }
+
+    if (!profileOk) continue;
   }
 
   console.log("=".repeat(50));
@@ -100,7 +110,7 @@ async function main() {
   for (const u of USERS) {
     console.log(`${u.role.padEnd(8)} ${u.email}  /  ${u.password}`);
   }
-  console.log("\nFaculty registration code (new faculty): FAC-DEMO-RV001");
+  console.log("\nCounselor registration code (new counselors): FAC-DEMO-RV001");
   console.log("Login: http://localhost:3000/login");
 }
 

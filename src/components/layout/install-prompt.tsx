@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/providers/language-provider";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
 import { isNativeApp } from "@/lib/capacitor/is-native";
+import { ANDROID_APK_FILENAME, ANDROID_APK_URL } from "@/lib/constants/download";
 import { cn } from "@/lib/utils";
 
 const DISMISS_KEY = "safevoice-install-dismissed";
@@ -15,9 +16,19 @@ function isMobileDevice() {
   return window.matchMedia("(max-width: 768px)").matches;
 }
 
+function triggerApkDownload() {
+  const link = document.createElement("a");
+  link.href = ANDROID_APK_URL;
+  link.download = ANDROID_APK_FILENAME;
+  link.rel = "noopener";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 export function InstallPrompt() {
   const { t } = useLanguage();
-  const { canInstall, canNativeInstall, isIos, promptInstall } = usePwaInstall();
+  const { canInstall, canNativeInstall, isIos, isAndroid, promptInstall } = usePwaInstall();
   const [visible, setVisible] = useState(false);
   const [mode, setMode] = useState<"android" | "ios">("android");
 
@@ -32,11 +43,11 @@ export function InstallPrompt() {
       return;
     }
 
-    if (canNativeInstall) {
+    if (isAndroid) {
       setMode("android");
       setVisible(true);
     }
-  }, [canInstall, canNativeInstall, isIos]);
+  }, [canInstall, isIos, isAndroid]);
 
   function dismiss() {
     localStorage.setItem(DISMISS_KEY, "1");
@@ -44,8 +55,13 @@ export function InstallPrompt() {
   }
 
   async function handleInstall() {
-    const accepted = await promptInstall();
-    if (accepted) setVisible(false);
+    if (canNativeInstall) {
+      const accepted = await promptInstall();
+      if (accepted) setVisible(false);
+      return;
+    }
+    triggerApkDownload();
+    setVisible(false);
   }
 
   if (isNativeApp() || !visible) return null;
@@ -69,7 +85,7 @@ export function InstallPrompt() {
             {mode === "android" ? t("pwa.installAndroid") : t("pwa.installIos")}
           </p>
           <div className="mt-3 flex gap-2">
-            {mode === "android" && canNativeInstall && (
+            {mode === "android" && (
               <Button size="sm" onClick={handleInstall}>
                 {t("pwa.installAction")}
               </Button>
@@ -92,3 +108,4 @@ export function InstallPrompt() {
     </div>
   );
 }
+

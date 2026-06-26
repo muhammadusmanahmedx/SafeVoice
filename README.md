@@ -38,7 +38,7 @@ npm install
 3. Run `supabase/seed.sql` for demo institutions and resources
 4. Copy `.env.example` to `.env.local` and fill in your keys
 
-Video counseling uses a free, embeddable **anonymous Jitsi** instance (`jitsi.riot.im`) by default — no signup, API keys, login, or "waiting for a moderator". Both faculty and student join the same booked room directly. Override the server with `JITSI_DOMAIN` if you prefer another instance. Note: `meet.jit.si` forces moderator login and `meet.ffmuc.net` blocks iframe embedding, so neither is suitable here.
+Video counseling uses a free, embeddable **anonymous Jitsi** instance (`jitsi.riot.im`) by default — no signup, API keys, login, or "waiting for a moderator". Both counselor and student join the same booked room directly. Override the server with `JITSI_DOMAIN` if you prefer another instance. Note: `meet.jit.si` forces moderator login and `meet.ffmuc.net` blocks iframe embedding, so neither is suitable here.
 
 ### 3. Run the development server
 
@@ -53,10 +53,10 @@ Open [http://localhost:3000](http://localhost:3000).
 | Role | Registration | Portal |
 |------|-------------|--------|
 | Student | `/register` — select institution | `/dashboard` |
-| Faculty | `/faculty-register` — access code | `/faculty/dashboard` |
+| Counselor | `/counselor-register` — access code | `/counselor/dashboard` |
 | Admin | Created via Supabase / seed | `/admin/dashboard` |
 
-## Demo Faculty Codes (after seed)
+## Demo Counselor Codes (after seed)
 
 - Riverside Academy: `FAC-DEMO-RV001`
 - Northfield University: `FAC-DEMO-NF001`
@@ -151,7 +151,7 @@ Camera and microphone are declared for Jitsi counseling video:
 3. AI chat send/receive
 4. Book counseling session
 5. Join Jitsi video (camera + mic)
-6. Faculty login → join same session
+6. Counselor login → join same session
 7. Android back button navigates correctly
 
 PWA install prompts are hidden automatically inside the native app.
@@ -167,7 +167,7 @@ src/
   app/
     (auth)/          # Login, register
     (student)/       # Student portal
-    (faculty)/       # Faculty portal
+    (counselor)/       # Counselor portal
     (admin)/         # Admin portal
     api/             # Chat, reports
   components/        # UI and feature components

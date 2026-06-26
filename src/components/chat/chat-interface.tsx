@@ -10,7 +10,8 @@ import { CrisisResourcesPanel, type CrisisResource } from "@/components/chat/cri
 import { shouldShowCrisisResources, shouldShowEscalation } from "@/lib/ai/risk";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import type { RiskAssessment } from "@/types";
-import { Mic, MicOff, Send, Sparkles, Shield } from "lucide-react";
+import { Mic, MicOff, Send } from "lucide-react";
+import Image from "next/image";
 import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
 
@@ -34,13 +35,25 @@ function toUIMessages(messages: { role: "user" | "assistant"; content: string }[
   }));
 }
 
-/** Strip residual markdown the model might still produce */
+/** Strip markdown and any leaked internal risk-assessment text from model output */
 function clean(text: string): string {
-  return text
+  let result = text
     .replace(/\*\*(.*?)\*\*/g, "$1")
     .replace(/\*(.*?)\*/g, "$1")
     .replace(/^#{1,6}\s+/gm, "")
     .replace(/^[-*+]\s+/gm, "• ");
+
+  // Remove trailing blocks the model sometimes adds when asked to "assess risk"
+  const cutPatterns = [
+    /\n+(?:risk assessment|assessrisk|internal assessment)[\s\S]*$/i,
+    /\n+\{[\s\S]*"riskLevel"[\s\S]*\}\s*$/,
+    /\n+(?:risk level|category|requires attention|summary)\s*:\s*[^\n]+(\n|$)/gi,
+  ];
+  for (const pattern of cutPatterns) {
+    result = result.replace(pattern, "");
+  }
+
+  return result.trim();
 }
 
 /**
@@ -79,70 +92,6 @@ function formatMessage(text: string): React.ReactNode {
       })}
     </div>
   );
-}
-
-/**
- * Types out text one character at a time.
- * - While streaming: each tick appends one character from targetRef
- * - When streaming ends: immediately shows full text
- */
-function AnimatedText({ text, isStreaming }: { text: string; isStreaming: boolean }) {
-  // History messages start fully displayed; new streaming messages start empty
-  const [displayed, setDisplayed] = useState(() => (isStreaming ? "" : text));
-  const targetRef = useRef(text);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Keep target always up-to-date so the tick closure reads the latest value
-  useEffect(() => {
-    targetRef.current = text;
-  }, [text]);
-
-  useEffect(() => {
-    if (!isStreaming) {
-      // Stream done — cancel any pending tick and snap to full text
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-      setDisplayed(text);
-      return;
-    }
-
-    // Start the tick loop only if not already running
-    if (timerRef.current !== null) return;
-
-    function tick() {
-      setDisplayed((cur) => {
-        const target = targetRef.current;
-        if (cur.length < target.length) {
-          // Schedule next character
-          timerRef.current = setTimeout(tick, 16); // ~60 chars / sec
-          return cur + target[cur.length];
-        }
-        // Caught up — wait for more characters
-        timerRef.current = setTimeout(tick, 16);
-        return cur;
-      });
-    }
-
-    timerRef.current = setTimeout(tick, 16);
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isStreaming]);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
-
-  return <>{formatMessage(displayed)}</>;
 }
 
 export function ChatInterface({ initialConversationId, initialMessages = [] }: ChatInterfaceProps) {
@@ -256,19 +205,17 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card">
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-border px-4 py-3 shrink-0">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-          <Sparkles className="h-4 w-4 text-primary" />
-        </div>
+        <Image src="/logo.png" alt="" width={32} height={32} className="rounded-full" />
         <div>
-          <p className="text-sm font-semibold">{t("student.chat.aiName")}</p>
-          <p className="text-xs text-muted-foreground">{t("student.chat.aiSubtitle")}</p>
+          <p className="text-sm font-semibold">{t("student.chat.counselorName")}</p>
+          <p className="text-xs text-muted-foreground">{t("student.chat.counselorSubtitle")}</p>
         </div>
         <div className="ml-auto flex items-center gap-1.5">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
           </span>
-          <span className="text-xs text-muted-foreground">{t("student.chat.statusActive")}</span>
+          <span className="text-xs text-muted-foreground">{t("student.chat.statusOnline")}</span>
         </div>
       </div>
 
@@ -277,9 +224,7 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
         <div className="mx-auto max-w-2xl space-y-5">
           {isEmpty && (
             <div className="flex flex-col items-center py-10 text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                <Shield className="h-7 w-7 text-primary" />
-              </div>
+              <Image src="/logo.png" alt="" width={56} height={56} className="mb-4 rounded-2xl" />
               <p className="text-base font-semibold">{t("student.chat.emptyTitle")}</p>
               <p className="mt-2 max-w-xs text-sm text-muted-foreground">
                 {t("student.chat.emptySubtitle")}
@@ -299,7 +244,7 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
           )}
 
           {messages.map((message, i) => {
-            const rawText = getMessageText(message);
+            const rawText = clean(getMessageText(message));
             const isUser = message.role === "user";
             const isLastAI = !isUser && i === messages.length - 1;
 
@@ -309,9 +254,13 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
                 className={cn("flex animate-fade-in", isUser ? "justify-end" : "justify-start")}
               >
                 {!isUser && (
-                  <div className="mr-2.5 mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                    <Sparkles className="h-3.5 w-3.5 text-primary" />
-                  </div>
+                  <Image
+                    src="/logo.png"
+                    alt=""
+                    width={28}
+                    height={28}
+                    className="me-2.5 mt-1 shrink-0 rounded-full"
+                  />
                 )}
                 <div
                   className={cn(
@@ -325,12 +274,8 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
                     <p className="leading-relaxed">{rawText}</p>
                   ) : (
                     <>
-                      <AnimatedText
-                        text={clean(rawText)}
-                        isStreaming={isLastAI && isStreaming}
-                      />
-                      {/* Blinking cursor while the last AI message is actively streaming */}
-                      {isLastAI && isStreaming && (
+                      {formatMessage(rawText)}
+                      {isLastAI && isStreaming && rawText.length > 0 && (
                         <span className="ml-0.5 inline-block h-[14px] w-[2px] translate-y-[2px] animate-pulse bg-current opacity-60" />
                       )}
                     </>
@@ -343,9 +288,13 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
           {/* Thinking dots (before first token) */}
           {isSubmitted && (
             <div className="flex animate-fade-in justify-start">
-              <div className="mr-2.5 mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                <Sparkles className="h-3.5 w-3.5 text-primary" />
-              </div>
+              <Image
+                src="/logo.png"
+                alt=""
+                width={28}
+                height={28}
+                className="me-2.5 mt-1 shrink-0 rounded-full"
+              />
               <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-sm bg-muted px-4 py-3.5">
                 <span className="typing-dot" />
                 <span className="typing-dot" />
@@ -416,9 +365,6 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
               <Send className="h-3.5 w-3.5" />
             </Button>
           </div>
-          <p className="mt-2 text-center text-xs text-muted-foreground">
-            {t("student.chat.footerDisclaimer")}
-          </p>
         </form>
       </div>
 

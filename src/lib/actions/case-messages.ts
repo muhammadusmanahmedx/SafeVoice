@@ -5,9 +5,9 @@ import { requireProfile } from "@/lib/auth/get-profile";
 import { revalidatePath } from "next/cache";
 
 export async function sendCaseMessage(caseId: string, content: string) {
-  const profile = await requireProfile(["student", "faculty", "admin"]);
+  const profile = await requireProfile(["student", "counselor", "admin"]);
   const supabase = await createClient();
-  const senderRole = profile.role === "student" ? "student" : "faculty";
+  const senderRole = profile.role === "student" ? "student" : "counselor";
 
   const { error } = await supabase.from("case_messages").insert({
     case_id: caseId,
@@ -17,7 +17,7 @@ export async function sendCaseMessage(caseId: string, content: string) {
 
   if (error) return { error: error.message };
   revalidatePath("/cases");
-  revalidatePath(`/faculty/cases/${caseId}`);
+  revalidatePath(`/counselor/cases/${caseId}`);
   return { success: true };
 }
 
@@ -51,12 +51,12 @@ export async function respondToIdentityReveal(requestId: string, accept: boolean
   }
 
   revalidatePath("/cases");
-  revalidatePath(`/faculty/cases/${request.case_id}`);
+  revalidatePath(`/counselor/cases/${request.case_id}`);
   return { success: true };
 }
 
 export async function requestIdentityReveal(caseId: string) {
-  const profile = await requireProfile(["faculty", "admin"]);
+  const profile = await requireProfile(["counselor", "admin"]);
   const supabase = await createClient();
 
   const { error } = await supabase.from("identity_reveal_requests").insert({
@@ -66,7 +66,7 @@ export async function requestIdentityReveal(caseId: string) {
   });
 
   if (error) return { error: error.message };
-  revalidatePath(`/faculty/cases/${caseId}`);
+  revalidatePath(`/counselor/cases/${caseId}`);
   return { success: true };
 }
 
@@ -74,7 +74,7 @@ export async function updateCaseStatus(
   caseId: string,
   status: "new" | "in_progress" | "escalated" | "resolved" | "unsubstantiated"
 ) {
-  await requireProfile(["faculty", "admin"]);
+  await requireProfile(["counselor", "admin"]);
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -83,13 +83,13 @@ export async function updateCaseStatus(
     .eq("id", caseId);
 
   if (error) return { error: error.message };
-  revalidatePath(`/faculty/cases/${caseId}`);
-  revalidatePath("/faculty/dashboard");
+  revalidatePath(`/counselor/cases/${caseId}`);
+  revalidatePath("/counselor/dashboard");
   return { success: true };
 }
 
 export async function addCaseNote(caseId: string, content: string) {
-  const profile = await requireProfile(["faculty", "admin"]);
+  const profile = await requireProfile(["counselor", "admin"]);
   const supabase = await createClient();
 
   const { error } = await supabase.from("case_notes").insert({
@@ -99,6 +99,6 @@ export async function addCaseNote(caseId: string, content: string) {
   });
 
   if (error) return { error: error.message };
-  revalidatePath(`/faculty/cases/${caseId}`);
+  revalidatePath(`/counselor/cases/${caseId}`);
   return { success: true };
 }

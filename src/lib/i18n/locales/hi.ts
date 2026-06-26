@@ -59,7 +59,7 @@ export const hi: Dictionary = {
 
   portal: {
     student: "छात्र पोर्टल",
-    faculty: "संकाय पोर्टल",
+    counselor: "संकाय पोर्टल",
     admin: "व्यवस्थापक पोर्टल",
     yourInstitution: "आपकी संस्था",
     safeguarding: "सुरक्षा एवं संरक्षण",
@@ -68,7 +68,7 @@ export const hi: Dictionary = {
 
   nav: {
     dashboard: "डैशबोर्ड",
-    aiAssistant: "AI सहायक",
+    aiAssistant: "परामर्श चैट",
     mood: "मनःस्थिति",
     resources: "संसाधन",
     counseling: "परामर्श",
@@ -76,10 +76,13 @@ export const hi: Dictionary = {
     alertInbox: "चेतावनी इनबॉक्स",
     cases: "मामले",
     patterns: "प्रवृत्तियाँ",
-    faculty: "संकाय",
+    counselor: "संकाय",
     announcements: "घोषणाएँ",
     reports: "रिपोर्ट",
     settings: "सेटिंग्स",
+    more: "और",
+    mainNavigation: "मुख्य नेविगेशन",
+    profile: "प्रोफ़ाइल",
   },
 
   theme: {
@@ -102,7 +105,7 @@ export const hi: Dictionary = {
     signingIn: "लॉग इन हो रहा है…",
     newStudent: "नए छात्र?",
     createAccount: "खाता बनाएँ",
-    facultyQuestion: "संकाय सदस्य?",
+    counselorQuestion: "संकाय सदस्य?",
     registerWithCode: "एक्सेस कोड से पंजीकरण करें",
     createYourAccount: "अपना खाता बनाएँ",
     registerSubtitle: "SafeVoice से जुड़ें — छात्र कल्याण के लिए एक निजी स्थान",
@@ -121,7 +124,7 @@ export const hi: Dictionary = {
     platformTagline: "चुप्पी संकट बनने से पहले छात्रों को आवाज़ देना। AI द्वारा संचालित 24/7 गुमनाम सहायता।",
     featureAnonymous: "डिज़ाइन से गुमनाम",
     featureSupport: "24/7 AI सहायता",
-    featureFaculty: "संकाय से जुड़ाव",
+    featureCounselor: "संकाय से जुड़ाव",
     featureEvidence: "साक्ष्य-आधारित",
     rightsReserved: "सर्वाधिकार सुरक्षित।",
     redirectTakingYou: "आपको वहाँ ले जाया जा रहा है…",
@@ -135,14 +138,14 @@ export const hi: Dictionary = {
       featureSupport247: "24/7 AI सहायता — जब भी ज़रूरत हो, हमेशा उपलब्ध",
       featureMoodTracking: "अपनी मनःस्थिति ट्रैक करें और समय के साथ पैटर्न पहचानें",
     },
-    facultyRegister: {
+    counselorRegister: {
       title: "संकाय पंजीकरण",
       subtitle: "अपनी संस्था के संकाय एक्सेस कोड से पंजीकरण करें",
       workEmail: "कार्य ईमेल",
-      facultyAccessCode: "संकाय एक्सेस कोड",
+      counselorAccessCode: "संकाय एक्सेस कोड",
       codeHint: "आपकी संस्था के व्यवस्थापक द्वारा प्रदान किया गया",
       registering: "पंजीकरण हो रहा है…",
-      registerAsFaculty: "संकाय के रूप में पंजीकरण",
+      registerAsCounselor: "संकाय के रूप में पंजीकरण",
       backToSignIn: "← लॉग इन पर वापस",
       panelBadge: "संकाय पोर्टल",
       panelHeadline: "छात्रों की रक्षा करें।",
@@ -171,7 +174,7 @@ export const hi: Dictionary = {
       subtitle:
         "एक निजी, गुमनाम AI कल्याण मंच। छात्रों को 24/7 सहायता मिलती है। संस्थाओं को सुरक्षा चिंताओं में शीघ्र दृश्यता — सब एक जगह।",
       ctaStudent: "छात्र के रूप में शुरू करें",
-      ctaFaculty: "संकाय पंजीकरण",
+      ctaCounselor: "संकाय पंजीकरण",
       downloadApp: "हमारा ऐप डाउनलोड करें",
       trustFullyAnonymous: "पूर्णतः गुमनाम",
       trust247: "24/7 उपलब्ध",
@@ -240,7 +243,7 @@ export const hi: Dictionary = {
         cta: "छात्र साइन अप",
         imageAlt: "छात्र पोर्टल",
       },
-      faculty: {
+      counselor: {
         role: "संकाय",
         desc: "गुमनामता से समझौता किए बिना छात्र चिंताओं में संरचित दृश्यता।",
         point1: "जोखिम-क्रमित चेतावना इनबॉक्स",
@@ -279,7 +282,7 @@ export const hi: Dictionary = {
       subtitle:
         "उन संस्थाओं से जुड़ें जो छात्रों की रक्षा, कल्याण समर्थन और प्रारंभिक सुरक्षा अंतर्दृष्टि के लिए SafeVoice पर भरोसा करती हैं।",
       signUpStudent: "छात्र के रूप में साइन अप",
-      facultyRegistration: "संकाय पंजीकरण",
+      counselorRegistration: "संकाय पंजीकरण",
       downloadApp: "हमारा ऐप डाउनलोड करें",
     },
     footer: {
@@ -345,11 +348,14 @@ export const hi: Dictionary = {
       },
     },
     chat: {
-      pageTitle: "AI कल्याण सहायक",
+      pageTitle: "परामर्श चैट",
       pageSubtitle: "निजी और गोपनीय — जो कुछ भी आप साझा करते हैं वह आप और SafeVoice के बीच रहता है",
-      aiName: "SafeVoice AI",
-      aiSubtitle: "कल्याण सहायक · पूर्णतः गोपनीय",
-      statusActive: "सक्रिय",
+      counselorName: "SafeVoice परामर्शदाता",
+      counselorSubtitle: "सुनने के लिए यहाँ · गोपनीय",
+      statusOnline: "ऑनलाइन",
+      aiName: "SafeVoice परामर्शदाता",
+      aiSubtitle: "सुनने के लिए यहाँ · गोपनीय",
+      statusActive: "ऑनलाइन",
       emptyTitle: "नमस्ते, मैं आपके लिए यहाँ हूँ",
       emptySubtitle: "यह एक सुरक्षित, गोपनीय स्थान है। आज आपके मन में क्या है?",
       suggestions: {
@@ -388,7 +394,7 @@ export const hi: Dictionary = {
         howLongPlaceholder: "जैसे: दो सप्ताह, सितंबर से",
         whoInvolved: "कौन शामिल है?",
         peopleStudent: "छात्र",
-        peopleFaculty: "संकाय",
+        peopleCounselor: "संकाय",
         peopleGroup: "समूह",
         peopleUnknown: "अज्ञात",
         othersAffected: "क्या यह अन्य छात्रों को प्रभावित करता है?",
@@ -485,7 +491,7 @@ export const hi: Dictionary = {
       detail: {
         messagesTitle: "संदेश",
         noMessages: "जब संकाय सदस्य आपके मामले की समीक्षा करेगा, यहाँ जवाब देगा।",
-        facultyResponse: "संकाय प्रतिक्रिया",
+        counselorResponse: "संकाय प्रतिक्रिया",
         you: "आप",
         replyPlaceholder: "गुमनाम रूप से जवाब दें…",
         revealTitle: "पहचान उजागर अनुरोध",
@@ -504,7 +510,7 @@ export const hi: Dictionary = {
     },
   },
 
-  faculty: {
+  counselor: {
     dashboard: {
       title: "संकाय डैशबोर्ड",
       subtitle: "गुमनाम छात्र सुरक्षा अवलोकन",
@@ -624,7 +630,7 @@ export const hi: Dictionary = {
       stats: {
         totalStudents: "कुल छात्र",
         enrolled: "नामांकित",
-        totalFaculty: "कुल संकाय",
+        totalCounselors: "कुल संकाय",
         activeStaff: "सक्रिय कर्मचारी",
         openCases: "खुले मामले",
         needsAttention: "ध्यान की आवश्यकता",
@@ -654,23 +660,23 @@ export const hi: Dictionary = {
         value: "मान",
       },
     },
-    faculty: {
+    counselor: {
       pageTitle: "संकाय प्रबंधन",
       pageSubtitle: "संकाय खाते और पंजीकरण कोड प्रबंधित करें",
       registrationCodes: "पंजीकरण कोड",
       generating: "बनाया जा रहा है…",
       generateCode: "कोड बनाएँ",
       newCodeLabel: "नया संकाय कोड (सुरक्षित रूप से साझा करें):",
-      facultyAccounts: "संकाय खाते",
+      counselorAccounts: "संकाय खाते",
       joined: "{date} को शामिल",
-      noFaculty: "अभी तक कोई संकाय पंजीकृत नहीं।",
+      noCounselors: "अभी तक कोई संकाय पंजीकृत नहीं।",
     },
     announcements: {
       pageTitle: "घोषणाएँ",
       pageSubtitle: "संकाय सदस्यों को दिखने वाले अपडेट प्रकाशित करें",
       publishTitle: "घोषणा प्रकाशित करें",
       publishing: "प्रकाशित हो रहा है…",
-      publishToFaculty: "संकाय को प्रकाशित करें",
+      publishToCounselors: "संकाय को प्रकाशित करें",
       empty: "अभी तक कोई घोषणा नहीं।",
     },
     reports: {
@@ -712,14 +718,14 @@ export const hi: Dictionary = {
     empty: "अभी तक कोई सूचना नहीं",
     unreadOverflow: "9+",
     student: {
-      facultyRepliedTitle: "संकाय ने आपके मामले का जवाब दिया",
+      counselorRepliedTitle: "संकाय ने आपके मामले का जवाब दिया",
       counselingBookedTitle: "परामर्श सत्र बुक हो गया",
       counselingBookedBody: "आपका सत्र {datetime} के लिए निर्धारित है।",
       counselingBookedBodyFallback: "आपका परामर्श सत्र पुष्टि हो गया।",
       identityRequestTitle: "पहचान उजागर अनुरोध",
       identityRequestBody: "एक संकाय सदस्य ने बेहतर सहायता के लिए आपकी पहचान जानने का अनुरोध किया।",
     },
-    faculty: {
+    counselor: {
       highRiskAlertTitle: "उच्च-जोखिम चेतावनी पता चली",
       highRiskAlertBody: "{incidentType} — AI द्वारा स्वचालित पता, तुरंत समीक्षा करें",
       newCaseTitle: "नया मामला जमा",
@@ -788,6 +794,11 @@ export const hi: Dictionary = {
     iosStep3: "\"Add\" दबाएँ — अब SafeVoice ऐप की तरह खुलेगा।",
     androidStep1: "ऊपर दाईं ओर ब्राउज़र मेनू (⋮) दबाएँ।",
     androidStep2: "\"Install app\" या \"Add to Home screen\" चुनें।",
+    apkInstallTitle: "SafeVoice इंस्टॉल करें",
+    apkInstallIntro: "ऐप डाउनलोड हो रहा है। अपने फ़ोन पर इंस्टॉल करने के लिए ये चरण फ़ॉलो करें:",
+    apkStep1: "Downloads फ़ोल्डर खोलें और SafeVoice.apk पर टैप करें।",
+    apkStep2: "पूछे जाने पर Install टैप करें।",
+    apkStep3: "अगर पूछा जाए तो ब्राउज़र से इंस्टॉल की अनुमति दें, फिर SafeVoice खोलें।",
   },
 
   incident: {

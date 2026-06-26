@@ -96,18 +96,18 @@ export function HomePageContent() {
       image: IMAGES.support,
       icon: Users,
       color: "bg-[#193852]",
-      role: t("landing.roles.faculty.role"),
-      desc: t("landing.roles.faculty.desc"),
+      role: t("landing.roles.counselor.role"),
+      desc: t("landing.roles.counselor.desc"),
       points: [
-        t("landing.roles.faculty.point1"),
-        t("landing.roles.faculty.point2"),
-        t("landing.roles.faculty.point3"),
-        t("landing.roles.faculty.point4"),
+        t("landing.roles.counselor.point1"),
+        t("landing.roles.counselor.point2"),
+        t("landing.roles.counselor.point3"),
+        t("landing.roles.counselor.point4"),
       ],
-      cta: t("landing.roles.faculty.cta"),
-      href: "/faculty-register",
+      cta: t("landing.roles.counselor.cta"),
+      href: "/counselor-register",
       featured: true,
-      imageAlt: t("landing.roles.faculty.imageAlt"),
+      imageAlt: t("landing.roles.counselor.imageAlt"),
     },
     {
       image: IMAGES.campus,
@@ -200,10 +200,10 @@ export function HomePageContent() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/faculty-register"
+                  href="/counselor-register"
                   className="flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-8 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
                 >
-                  {t("landing.hero.ctaFaculty")}
+                  {t("landing.hero.ctaCounselor")}
                 </Link>
                 <DownloadAppButton />
               </div>
@@ -516,10 +516,10 @@ export function HomePageContent() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/faculty-register"
+                  href="/counselor-register"
                   className="flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-8 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
                 >
-                  {t("landing.cta.facultyRegistration")}
+                  {t("landing.cta.counselorRegistration")}
                 </Link>
                 <DownloadAppButton label={t("landing.cta.downloadApp")} variant="cta" />
               </div>

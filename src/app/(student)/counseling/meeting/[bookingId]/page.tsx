@@ -16,8 +16,8 @@ export default async function StudentMeetingPage({ params }: PageProps) {
     .from("counseling_bookings")
     .select(`
       id, status, meeting_room_name,
-      slot:counseling_slots (slot_at, duration_minutes, faculty_id,
-        faculty:profiles (display_name))
+      slot:counseling_slots (slot_at, duration_minutes, counselor_id,
+        counselor:profiles (display_name))
     `)
     .eq("id", bookingId)
     .eq("student_id", profile.id)
@@ -30,7 +30,7 @@ export default async function StudentMeetingPage({ params }: PageProps) {
   const slot = booking.slot as {
     slot_at: string;
     duration_minutes: number;
-    faculty: { display_name: string } | null;
+    counselor: { display_name: string } | null;
   };
 
   if (booking.status === "cancelled") {

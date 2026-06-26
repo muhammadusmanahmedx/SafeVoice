@@ -10,13 +10,13 @@ export default async function AdminDashboard() {
 
   const [
     { count: studentCount },
-    { count: facultyCount },
+    { count: counselorCount },
     { data: cases },
     { data: riskAssessments },
     { data: moodLogs },
   ] = await Promise.all([
     supabase.from("profiles").select("*", { count: "exact", head: true }).eq("institution_id", institutionId).eq("role", "student"),
-    supabase.from("profiles").select("*", { count: "exact", head: true }).eq("institution_id", institutionId).eq("role", "faculty"),
+    supabase.from("profiles").select("*", { count: "exact", head: true }).eq("institution_id", institutionId).eq("role", "counselor"),
     supabase.from("cases").select("status, severity, incident_type, location, created_at").eq("institution_id", institutionId),
     supabase.from("risk_assessments").select("risk_level, created_at").eq("institution_id", institutionId),
     supabase.from("mood_logs").select("mood, logged_at").eq("institution_id", institutionId),
@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
     <AdminDashboardView
       institutionName={profile.institutions?.name ?? "Institution"}
       studentCount={studentCount ?? 0}
-      facultyCount={facultyCount ?? 0}
+      counselorCount={counselorCount ?? 0}
       openCases={openCases}
       resolvedCases={resolvedCases}
       highRisk={highRisk}

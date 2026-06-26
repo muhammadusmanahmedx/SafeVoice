@@ -10,7 +10,7 @@ import { Users, Shield, FolderOpen, CheckCircle2, AlertTriangle, TrendingUp } fr
 interface AdminDashboardViewProps {
   institutionName: string;
   studentCount: number;
-  facultyCount: number;
+  counselorCount: number;
   openCases: number;
   resolvedCases: number;
   highRisk: number;
@@ -25,7 +25,7 @@ interface AdminDashboardViewProps {
 export function AdminDashboardView({
   institutionName,
   studentCount,
-  facultyCount,
+  counselorCount,
   openCases,
   resolvedCases,
   highRisk,
@@ -39,8 +39,8 @@ export function AdminDashboardView({
   const { t } = useLanguage();
 
   const stats = [
-    { labelKey: "admin.dashboard.stats.totalStudents", subKey: "admin.dashboard.stats.enrolled", value: studentCount, icon: Users, iconBg: "bg-blue-50", iconColor: "text-blue-600", href: "/admin/faculty" },
-    { labelKey: "admin.dashboard.stats.totalFaculty", subKey: "admin.dashboard.stats.activeStaff", value: facultyCount, icon: Shield, iconBg: "bg-[#193852]/10", iconColor: "text-[#193852]", href: "/admin/faculty" },
+    { labelKey: "admin.dashboard.stats.totalStudents", subKey: "admin.dashboard.stats.enrolled", value: studentCount, icon: Users, iconBg: "bg-blue-50", iconColor: "text-blue-600", href: "/admin/counselors" },
+    { labelKey: "admin.dashboard.stats.totalCounselors", subKey: "admin.dashboard.stats.activeStaff", value: counselorCount, icon: Shield, iconBg: "bg-[#193852]/10", iconColor: "text-[#193852]", href: "/admin/counselors" },
     { labelKey: "admin.dashboard.stats.openCases", subKey: "admin.dashboard.stats.needsAttention", value: openCases, icon: FolderOpen, iconBg: "bg-amber-50", iconColor: "text-amber-600", href: "/admin/reports" },
     { labelKey: "admin.dashboard.stats.resolvedCases", subKey: "admin.dashboard.stats.closedSuccessfully", value: resolvedCases, icon: CheckCircle2, iconBg: "bg-green-50", iconColor: "text-green-600", href: "/admin/reports" },
     { labelKey: "admin.dashboard.stats.highRisk", subKey: "admin.dashboard.stats.urgentReview", value: highRisk, icon: AlertTriangle, iconBg: "bg-red-50", iconColor: "text-red-600", href: "/admin/reports" },

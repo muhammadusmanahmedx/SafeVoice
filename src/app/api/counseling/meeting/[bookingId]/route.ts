@@ -10,7 +10,7 @@ export async function GET(
 ) {
   const { bookingId } = await params;
 
-  const auth = await requireApiProfile(["student", "faculty", "admin"]);
+  const auth = await requireApiProfile(["student", "counselor", "admin"]);
   if ("error" in auth) {
     return Response.json({ error: auth.error }, { status: auth.status });
   }
@@ -22,7 +22,7 @@ export async function GET(
     .from("counseling_bookings")
     .select(`
       id, student_id, institution_id, meeting_room_name, status,
-      slot:counseling_slots (slot_at, duration_minutes, faculty_id)
+      slot:counseling_slots (slot_at, duration_minutes, counselor_id)
     `)
     .eq("id", bookingId)
     .single();
@@ -34,15 +34,15 @@ export async function GET(
   const slot = booking.slot as {
     slot_at: string;
     duration_minutes: number;
-    faculty_id: string;
+    counselor_id: string;
   };
 
   const isStudent = profile.role === "student" && booking.student_id === profile.id;
-  const isFaculty =
-    (profile.role === "faculty" || profile.role === "admin") &&
-    slot.faculty_id === profile.id;
+  const isCounselor =
+    (profile.role === "counselor" || profile.role === "admin") &&
+    slot.counselor_id === profile.id;
 
-  if (!isStudent && !isFaculty) {
+  if (!isStudent && !isCounselor) {
     return Response.json({ error: "You are not a participant in this session." }, { status: 403 });
   }
 
@@ -72,6 +72,6 @@ export async function GET(
     roomName: booking.meeting_room_name,
     jitsiDomain: getJitsiDomain(),
     userName,
-    role: isStudent ? "student" : "faculty",
+    role: isStudent ? "student" : "counselor",
   });
 }

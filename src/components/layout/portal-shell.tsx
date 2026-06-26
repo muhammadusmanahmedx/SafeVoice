@@ -11,11 +11,17 @@ import { useLanguage } from "@/components/providers/language-provider";
 import { signOut } from "@/lib/auth/actions";
 import {
   Bell, BookOpen, Calendar, FileBarChart, FolderOpen, LayoutDashboard,
-  LogOut, Megaphone, Menu, MessageCircle, Settings,
-  Smile, TrendingUp, Users, X, type LucideIcon,
+  LogOut, Megaphone, MessageCircle, Settings,
+  Smile, TrendingUp, User, Users, type LucideIcon,
 } from "lucide-react";
-import { useState } from "react";
 import { NotificationBell } from "@/components/layout/notification-bell";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const NAV_ICONS = {
   "layout-dashboard": LayoutDashboard,
@@ -44,27 +50,87 @@ interface PortalShellProps {
   titleKey: string;
   subtitle?: string;
   navItems: NavItem[];
+  /** Bottom tabs on mobile; defaults to all navItems when omitted */
+  mobileNavItems?: NavItem[];
+  /** Extra links shown in the mobile profile menu */
+  profileMenuItems?: NavItem[];
   children: React.ReactNode;
   userId?: string;
   role?: string;
+}
+
+function NavLink({
+  item,
+  active,
+  onClick,
+  compact,
+}: {
+  item: NavItem;
+  active: boolean;
+  onClick?: () => void;
+  compact?: boolean;
+}) {
+  const { t } = useLanguage();
+  const Icon = NAV_ICONS[item.icon];
+
+  if (compact) {
+    return (
+      <Link
+        href={item.href}
+        prefetch
+        onClick={onClick}
+        className={cn(
+          "flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[10px] font-medium transition-colors",
+          active ? "text-primary" : "text-muted-foreground"
+        )}
+      >
+        <Icon className={cn("h-5 w-5 shrink-0", active && "stroke-[2.5]")} />
+        <span className="max-w-full truncate leading-tight">{t(item.labelKey)}</span>
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      href={item.href}
+      prefetch
+      onClick={onClick}
+      className={cn(
+        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+        active
+          ? "bg-primary text-primary-foreground shadow-sm"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+      )}
+    >
+      <Icon className="h-4 w-4 shrink-0" />
+      {t(item.labelKey)}
+    </Link>
+  );
 }
 
 export function PortalShell({
   titleKey,
   subtitle,
   navItems,
+  mobileNavItems,
+  profileMenuItems = [],
   children,
   userId,
   role,
 }: PortalShellProps) {
   const pathname = usePathname();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const { t } = useLanguage();
   const title = t(titleKey);
+  const bottomTabs = mobileNavItems ?? navItems;
+
+  function isActive(href: string) {
+    return pathname === href || pathname.startsWith(href + "/");
+  }
+
+  const profileActive = profileMenuItems.some((item) => isActive(item.href));
 
   const sidebar = (
     <aside className="relative flex h-full w-64 shrink-0 flex-col border-e border-border bg-card lg:h-dvh">
-      {/* Desktop: pad below status bar when sidebar is in the page flow */}
       <div className="hidden h-0 shrink-0 pt-safe lg:block" />
 
       <div className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
@@ -77,9 +143,6 @@ export function PortalShell({
         </Link>
         <div className="flex items-center gap-1">
           {userId && <NotificationBell userId={userId} role={role} />}
-          <Button variant="ghost" size="icon" className="h-7 w-7 lg:hidden" onClick={() => setMobileOpen(false)}>
-            <X className="h-4 w-4" />
-          </Button>
         </div>
       </div>
 
@@ -91,27 +154,9 @@ export function PortalShell({
 
       <nav className="flex-1 overflow-y-auto p-3">
         <div className="space-y-0.5">
-          {navItems.map((item) => {
-            const Icon = NAV_ICONS[item.icon];
-            const active = pathname === item.href || pathname.startsWith(item.href + "/");
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                  active
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                {t(item.labelKey)}
-              </Link>
-            );
-          })}
+          {navItems.map((item) => (
+            <NavLink key={item.href} item={item} active={isActive(item.href)} />
+          ))}
         </div>
       </nav>
 
@@ -139,39 +184,75 @@ export function PortalShell({
     <div className="flex h-dvh overflow-hidden bg-background">
       <div className="order-1 hidden lg:flex rtl:order-2">{sidebar}</div>
 
-      {mobileOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
-            onClick={() => setMobileOpen(false)}
-          />
-          <div className="fixed start-0 bottom-0 top-safe z-50 w-64 lg:hidden">{sidebar}</div>
-        </>
-      )}
-
       <div className="order-2 flex min-w-0 flex-1 flex-col overflow-hidden rtl:order-1">
-        {/* Mobile header — background fills into status bar via padding */}
         <header className="relative shrink-0 border-b border-border bg-card lg:hidden">
           <div className="pt-safe" />
           <div className="flex h-14 items-center justify-between px-4">
-            <div className="flex items-center gap-1">
-              <Button variant="ghost" size="icon" className="me-1 rounded-xl" onClick={() => setMobileOpen(true)}>
-                <Menu className="h-5 w-5" />
-              </Button>
-              <div className="flex items-center gap-2">
-                <Image src="/logo.png" alt="SafeVoice" width={28} height={28} className="rounded-lg" />
-                <span className="text-sm font-semibold">{title}</span>
-              </div>
+            <div className="flex min-w-0 items-center gap-2">
+              <Image src="/logo.png" alt="SafeVoice" width={28} height={28} className="shrink-0 rounded-lg" />
+              <span className="truncate text-sm font-semibold">{title}</span>
             </div>
-            <div className="flex items-center gap-1">
-              {userId && <NotificationBell userId={userId} role={role} />}
+            <div className="flex shrink-0 items-center gap-0.5">
               <LanguageToggle />
-              <ThemeToggle />
+              {userId && <NotificationBell userId={userId} role={role} />}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn("rounded-xl", profileActive && "text-primary")}
+                    aria-label={t("nav.profile")}
+                  >
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  {profileMenuItems.map((item) => {
+                    const Icon = NAV_ICONS[item.icon];
+                    return (
+                      <DropdownMenuItem key={item.href} asChild>
+                        <Link href={item.href} className="flex w-full items-center gap-2">
+                          <Icon className="h-4 w-4" />
+                          {t(item.labelKey)}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                  {profileMenuItems.length > 0 && <DropdownMenuSeparator />}
+                  <div className="flex items-center gap-1 px-2 py-1.5">
+                    <span className="flex-1 text-xs text-muted-foreground">{t("theme.toggle")}</span>
+                    <ThemeToggle />
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <form action={signOut} className="w-full">
+                      <button type="submit" className="flex w-full items-center gap-2 text-sm">
+                        <LogOut className="h-4 w-4" />
+                        {t("common.signOut")}
+                      </button>
+                    </form>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 min-h-0 overflow-y-auto p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6">{children}</main>
+        <main className="flex-1 min-h-0 overflow-y-auto p-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:p-6 lg:pb-[max(1rem,env(safe-area-inset-bottom))]">
+          {children}
+        </main>
+
+        <nav
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-sm lg:hidden"
+          aria-label={t("nav.mainNavigation")}
+        >
+          <div className="pb-safe" />
+          <div className="flex h-14 items-stretch">
+            {bottomTabs.map((item) => (
+              <NavLink key={item.href} item={item} active={isActive(item.href)} compact />
+            ))}
+          </div>
+        </nav>
       </div>
     </div>
   );

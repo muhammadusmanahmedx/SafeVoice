@@ -21,8 +21,8 @@ INSERT INTO resources (institution_id, category, title, description, type, url, 
   ('11111111-1111-1111-1111-111111111111', 'anxiety', 'Riverside Peer Support Group', 'Weekly peer support meetings', 'institution', 'https://riverside.edu/peer-support', false),
   ('22222222-2222-2222-2222-222222222222', 'institution', 'Northfield Wellbeing Hub', 'Student wellbeing services', 'institution', 'https://northfield.edu/wellbeing', false);
 
--- Faculty registration codes (for demo — use in faculty registration)
-INSERT INTO faculty_codes (institution_id, code, expires_at) VALUES
+-- Counselor registration codes (for demo — use in counselor registration)
+INSERT INTO counselor_codes (institution_id, code, expires_at) VALUES
   ('11111111-1111-1111-1111-111111111111', 'FAC-DEMO-RV001', now() + interval '365 days'),
   ('22222222-2222-2222-2222-222222222222', 'FAC-DEMO-NF001', now() + interval '365 days');
 
@@ -31,7 +31,7 @@ INSERT INTO announcements (institution_id, title, content, published_at) VALUES
   ('11111111-1111-1111-1111-111111111111', 'Counseling Available This Week', 'The Riverside Counseling Center has extended hours this week. Walk-ins welcome Mon–Fri, 9am–5pm. Book a confidential session directly in SafeVoice.', now()),
   ('22222222-2222-2222-2222-222222222222', 'Wellbeing Hub Open House', 'Visit the Northfield Wellbeing Hub this Thursday for free stress-management workshops and peer support sessions. Book a counseling session in the app.', now());
 
--- Note: Counseling slots are created by faculty in the Faculty Portal → Counseling → My Availability
+-- Note: Counseling slots are created by counselor in the Counselor Portal → Counseling → My Availability
 
 -- Note: User accounts must be created via Supabase Auth, then profiles inserted.
 -- Demo accounts to create manually:

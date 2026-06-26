@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getRoleDashboard } from "@/lib/auth/get-profile";
+import { normalizeRole } from "@/lib/auth/roles";
 
 export async function signIn(formData: FormData) {
   const supabase = await createClient();
@@ -31,7 +32,7 @@ export async function signIn(formData: FormData) {
     };
   }
 
-  return { redirectTo: getRoleDashboard(profile.role as "student" | "faculty" | "admin") };
+  return { redirectTo: getRoleDashboard(normalizeRole(profile.role)) };
 }
 
 export async function signUpStudent(formData: FormData) {
@@ -61,26 +62,26 @@ export async function signUpStudent(formData: FormData) {
   return { redirectTo: "/dashboard" };
 }
 
-export async function signUpFaculty(formData: FormData) {
+export async function signUpCounselor(formData: FormData) {
   const supabase = await createClient();
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const displayName = formData.get("displayName") as string;
-  const facultyCode = formData.get("facultyCode") as string;
+  const counselorCode = formData.get("counselorCode") as string;
 
   const { data: codeData, error: codeError } = await supabase
-    .from("faculty_codes")
+    .from("counselor_codes")
     .select("*")
-    .eq("code", facultyCode)
+    .eq("code", counselorCode)
     .is("used_by", null)
     .single();
 
   if (codeError || !codeData) {
-    return { error: "Invalid or expired faculty access code" };
+    return { error: "Invalid or expired counselor access code" };
   }
 
   if (codeData.expires_at && new Date(codeData.expires_at) < new Date()) {
-    return { error: "Faculty access code has expired" };
+    return { error: "Counselor access code has expired" };
   }
 
   const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -94,18 +95,18 @@ export async function signUpFaculty(formData: FormData) {
   const { error: profileError } = await supabase.from("profiles").insert({
     id: authData.user.id,
     institution_id: codeData.institution_id,
-    role: "faculty",
+    role: "counselor",
     display_name: displayName,
   });
 
   if (profileError) return { error: profileError.message };
 
   await supabase
-    .from("faculty_codes")
+    .from("counselor_codes")
     .update({ used_by: authData.user.id, used_at: new Date().toISOString() })
     .eq("id", codeData.id);
 
-  return { redirectTo: "/faculty/dashboard" };
+  return { redirectTo: "/counselor/dashboard" };
 }
 
 export async function signOut() {

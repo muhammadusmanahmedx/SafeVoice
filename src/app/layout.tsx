@@ -58,6 +58,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <script
           dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()){var h=function(){try{var p=window.Capacitor.Plugins;if(p&&p.SplashScreen&&p.SplashScreen.hide)p.SplashScreen.hide();}catch(e){}};h();document.addEventListener("DOMContentLoaded",h);window.addEventListener("load",h);}}catch(e){}})();`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
             __html: `(function(){if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())return;window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__pwaInstallPrompt=e;window.dispatchEvent(new Event("pwa:install-available"));});window.addEventListener("appinstalled",function(){window.__pwaInstallPrompt=null;window.dispatchEvent(new Event("pwa:installed"));});})();`,
           }}
         />

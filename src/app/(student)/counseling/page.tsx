@@ -13,8 +13,8 @@ export default async function CounselingPage() {
     supabase
       .from("counseling_slots")
       .select(`
-        id, slot_at, duration_minutes, faculty_id,
-        faculty:profiles!counseling_slots_faculty_id_fkey (display_name)
+        id, slot_at, duration_minutes, counselor_id,
+        counselor:profiles (display_name)
       `)
       .eq("institution_id", profile.institution_id)
       .gte("slot_at", now)
@@ -24,17 +24,17 @@ export default async function CounselingPage() {
       .select(`
         id, topic, status, created_at,
         slot:counseling_slots (
-          id, slot_at, duration_minutes, faculty_id,
-          faculty:profiles!counseling_slots_faculty_id_fkey (display_name)
+          id, slot_at, duration_minutes, counselor_id,
+          counselor:profiles (display_name)
         )
       `)
       .eq("student_id", profile.id)
       .order("created_at", { ascending: false }),
     supabase
-      .from("faculty_weekly_availability")
+      .from("counselor_weekly_availability")
       .select(`
-        faculty_id, day_of_week, start_time, end_time,
-        faculty:profiles!faculty_weekly_availability_faculty_id_fkey (display_name)
+        counselor_id, day_of_week, start_time, end_time,
+        counselor:profiles (display_name)
       `)
       .eq("institution_id", profile.institution_id),
   ]);
@@ -49,11 +49,11 @@ export default async function CounselingPage() {
     .filter((s) => !bookedSlotIds.has(s.id))
     .map((s) => ({
       id: s.id,
-      faculty_id: s.faculty_id,
+      counselor_id: s.counselor_id,
       slot_at: s.slot_at,
       duration_minutes: s.duration_minutes,
       counselor_name:
-        (s.faculty as { display_name: string | null } | null)?.display_name ??
+        (s.counselor as { display_name: string | null } | null)?.display_name ??
         "Counselor",
     }));
 
@@ -64,8 +64,8 @@ export default async function CounselingPage() {
         id: string;
         slot_at: string;
         duration_minutes: number;
-        faculty_id: string;
-        faculty: { display_name: string | null } | null;
+        counselor_id: string;
+        counselor: { display_name: string | null } | null;
       };
       return {
         id: b.id,
@@ -74,18 +74,18 @@ export default async function CounselingPage() {
         created_at: b.created_at,
         slot: {
           id: slot.id,
-          faculty_id: slot.faculty_id,
+          counselor_id: slot.counselor_id,
           slot_at: slot.slot_at,
           duration_minutes: slot.duration_minutes,
-          counselor_name: slot.faculty?.display_name ?? "Counselor",
+          counselor_name: slot.counselor?.display_name ?? "Counselor",
         },
       };
     });
 
   const weeklyRanges: WeeklyAvailabilityRange[] = (weeklyRows ?? []).map((r) => ({
-    faculty_id: r.faculty_id,
+    counselor_id: r.counselor_id,
     counselor_name:
-      (r.faculty as { display_name: string | null } | null)?.display_name ?? "Counselor",
+      (r.counselor as { display_name: string | null } | null)?.display_name ?? "Counselor",
     day_of_week: r.day_of_week,
     start_time: r.start_time,
     end_time: r.end_time,

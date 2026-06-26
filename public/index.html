@@ -16,6 +16,15 @@
         justify-content: center;
       }
     </style>
+    <script>
+      (function () {
+        var REMOTE = "https://safe-voices.vercel.app";
+        var host = window.location.hostname;
+        if (host === "localhost" || host === "127.0.0.1") {
+          window.location.replace(REMOTE);
+        }
+      })();
+    </script>
   </head>
   <body>
     <p>Loading SafeVoice…</p>

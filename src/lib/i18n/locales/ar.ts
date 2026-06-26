@@ -59,7 +59,7 @@ export const ar: Dictionary = {
 
   portal: {
     student: "بوابة الطلاب",
-    faculty: "بوابة أعضاء هيئة التدريس",
+    counselor: "بوابة أعضاء هيئة التدريس",
     admin: "بوابة الإدارة",
     yourInstitution: "مؤسستك",
     safeguarding: "الحماية والرعاية",
@@ -68,7 +68,7 @@ export const ar: Dictionary = {
 
   nav: {
     dashboard: "لوحة التحكم",
-    aiAssistant: "المساعد الذكي",
+    aiAssistant: "محادثة الإرشاد",
     mood: "المزاج",
     resources: "الموارد",
     counseling: "الإرشاد",
@@ -76,10 +76,13 @@ export const ar: Dictionary = {
     alertInbox: "صندوق التنبيهات",
     cases: "الحالات",
     patterns: "الأنماط",
-    faculty: "أعضاء هيئة التدريس",
+    counselor: "أعضاء هيئة التدريس",
     announcements: "الإعلانات",
     reports: "التقارير",
     settings: "الإعدادات",
+    more: "المزيد",
+    mainNavigation: "التنقل الرئيسي",
+    profile: "الملف الشخصي",
   },
 
   theme: {
@@ -102,7 +105,7 @@ export const ar: Dictionary = {
     signingIn: "جارٍ تسجيل الدخول…",
     newStudent: "طالب جديد؟",
     createAccount: "إنشاء حساب",
-    facultyQuestion: "عضو هيئة تدريس؟",
+    counselorQuestion: "عضو هيئة تدريس؟",
     registerWithCode: "التسجيل برمز الوصول",
     createYourAccount: "أنشئ حسابك",
     registerSubtitle: "انضم إلى SafeVoice — مساحة خاصة لرفاهية الطلاب",
@@ -121,7 +124,7 @@ export const ar: Dictionary = {
     platformTagline: "نمنح الطلاب صوتاً قبل أن يتحول الصمت إلى أزمة. دعم مجهول على مدار الساعة مدعوم بالذكاء الاصطناعي.",
     featureAnonymous: "مجهول بالتصميم",
     featureSupport: "دعم ذكي على مدار الساعة",
-    featureFaculty: "تواصل مع أعضاء هيئة التدريس",
+    featureCounselor: "تواصل مع أعضاء هيئة التدريس",
     featureEvidence: "مبني على الأدلة",
     rightsReserved: "جميع الحقوق محفوظة.",
     redirectTakingYou: "جارٍ توجيهك…",
@@ -135,14 +138,14 @@ export const ar: Dictionary = {
       featureSupport247: "دعم ذكي على مدار الساعة — متاح دائماً عندما تحتاجه",
       featureMoodTracking: "تتبع مزاجك ورصد الأنماط مع مرور الوقت",
     },
-    facultyRegister: {
+    counselorRegister: {
       title: "تسجيل أعضاء هيئة التدريس",
       subtitle: "سجّل باستخدام رمز وصول أعضاء هيئة التدريس الخاص بمؤسستك",
       workEmail: "البريد الإلكتروني الوظيفي",
-      facultyAccessCode: "رمز وصول أعضاء هيئة التدريس",
+      counselorAccessCode: "رمز وصول أعضاء هيئة التدريس",
       codeHint: "يُقدَّم من قبل مسؤول مؤسستك",
       registering: "جارٍ التسجيل…",
-      registerAsFaculty: "التسجيل كعضو هيئة تدريس",
+      registerAsCounselor: "التسجيل كعضو هيئة تدريس",
       backToSignIn: "← العودة إلى تسجيل الدخول",
       panelBadge: "بوابة أعضاء هيئة التدريس",
       panelHeadline: "احمِ الطلاب.",
@@ -171,7 +174,7 @@ export const ar: Dictionary = {
       subtitle:
         "منصة رفاهية خاصة ومجهولة مدعومة بالذكاء الاصطناعي. يحصل الطلاب على دعم على مدار الساعة. وتحصل المؤسسات على رؤية مبكرة لمخاوف الحماية — كل ذلك في مكان واحد.",
       ctaStudent: "ابدأ كطالب",
-      ctaFaculty: "تسجيل أعضاء هيئة التدريس",
+      ctaCounselor: "تسجيل أعضاء هيئة التدريس",
       downloadApp: "حمّل تطبيقنا",
       trustFullyAnonymous: "مجهول بالكامل",
       trust247: "متاح على مدار الساعة",
@@ -240,7 +243,7 @@ export const ar: Dictionary = {
         cta: "تسجيل الطلاب",
         imageAlt: "بوابة الطلاب",
       },
-      faculty: {
+      counselor: {
         role: "أعضاء هيئة التدريس",
         desc: "رؤية منظمة لمخاوف الطلاب — دون المساس بالسرية.",
         point1: "صندوق تنبيهات مرتب حسب المخاطر",
@@ -279,7 +282,7 @@ export const ar: Dictionary = {
       subtitle:
         "انضم إلى المؤسسات التي تثق في SafeVoice لحماية الطلاب ودعم رفاهيتهم وتوفير رؤى حماية مبكرة.",
       signUpStudent: "التسجيل كطالب",
-      facultyRegistration: "تسجيل أعضاء هيئة التدريس",
+      counselorRegistration: "تسجيل أعضاء هيئة التدريس",
       downloadApp: "حمّل تطبيقنا",
     },
     footer: {
@@ -345,11 +348,14 @@ export const ar: Dictionary = {
       },
     },
     chat: {
-      pageTitle: "مساعد الرفاهية الذكي",
+      pageTitle: "محادثة الإرشاد",
       pageSubtitle: "خاص وسري — كل ما تشاركه يبقى بينك وبين SafeVoice",
-      aiName: "SafeVoice AI",
-      aiSubtitle: "مساعد الرفاهية · سري للغاية",
-      statusActive: "نشط",
+      counselorName: "مستشار SafeVoice",
+      counselorSubtitle: "هنا للاستماع · سري",
+      statusOnline: "متصل",
+      aiName: "مستشار SafeVoice",
+      aiSubtitle: "هنا للاستماع · سري",
+      statusActive: "متصل",
       emptyTitle: "مرحباً، أنا هنا من أجلك",
       emptySubtitle: "هذه مساحة آمنة وسريّة. ما الذي يشغل بالك اليوم؟",
       suggestions: {
@@ -388,7 +394,7 @@ export const ar: Dictionary = {
         howLongPlaceholder: "مثال: أسبوعان، منذ سبتمبر",
         whoInvolved: "من المعني؟",
         peopleStudent: "طالب",
-        peopleFaculty: "عضو هيئة تدريس",
+        peopleCounselor: "عضو هيئة تدريس",
         peopleGroup: "مجموعة",
         peopleUnknown: "غير معروف",
         othersAffected: "هل يؤثر هذا على طلاب آخرين؟",
@@ -485,7 +491,7 @@ export const ar: Dictionary = {
       detail: {
         messagesTitle: "الرسائل",
         noMessages: "سيرد عضو هيئة تدريس هنا عند مراجعة حالتك.",
-        facultyResponse: "رد عضو هيئة التدريس",
+        counselorResponse: "رد عضو هيئة التدريس",
         you: "أنت",
         replyPlaceholder: "رد بشكل مجهول...",
         revealTitle: "طلب كشف الهوية",
@@ -504,7 +510,7 @@ export const ar: Dictionary = {
     },
   },
 
-  faculty: {
+  counselor: {
     dashboard: {
       title: "لوحة أعضاء هيئة التدريس",
       subtitle: "نظرة عامة مجهولة على حماية الطلاب",
@@ -624,7 +630,7 @@ export const ar: Dictionary = {
       stats: {
         totalStudents: "إجمالي الطلاب",
         enrolled: "مسجّلون",
-        totalFaculty: "إجمالي أعضاء هيئة التدريس",
+        totalCounselors: "إجمالي أعضاء هيئة التدريس",
         activeStaff: "موظفون نشطون",
         openCases: "الحالات المفتوحة",
         needsAttention: "تحتاج اهتماماً",
@@ -654,23 +660,23 @@ export const ar: Dictionary = {
         value: "القيمة",
       },
     },
-    faculty: {
+    counselor: {
       pageTitle: "إدارة أعضاء هيئة التدريس",
       pageSubtitle: "إدارة حسابات أعضاء هيئة التدريس ورموز التسجيل",
       registrationCodes: "رموز التسجيل",
       generating: "جارٍ التوليد...",
       generateCode: "توليد رمز",
       newCodeLabel: "رمز أعضاء هيئة تدريس جديد (شاركه بأمان):",
-      facultyAccounts: "حسابات أعضاء هيئة التدريس",
+      counselorAccounts: "حسابات أعضاء هيئة التدريس",
       joined: "انضم {date}",
-      noFaculty: "لم يُسجَّل أي عضو هيئة تدريس بعد.",
+      noCounselors: "لم يُسجَّل أي عضو هيئة تدريس بعد.",
     },
     announcements: {
       pageTitle: "الإعلانات",
       pageSubtitle: "نشر تحديثات مرئية لأعضاء هيئة التدريس",
       publishTitle: "نشر إعلان",
       publishing: "جارٍ النشر...",
-      publishToFaculty: "نشر لأعضاء هيئة التدريس",
+      publishToCounselors: "نشر لأعضاء هيئة التدريس",
       empty: "لا توجد إعلانات بعد.",
     },
     reports: {
@@ -712,14 +718,14 @@ export const ar: Dictionary = {
     empty: "لا توجد إشعارات بعد",
     unreadOverflow: "9+",
     student: {
-      facultyRepliedTitle: "ردّ عضو هيئة تدريس على حالتك",
+      counselorRepliedTitle: "ردّ عضو هيئة تدريس على حالتك",
       counselingBookedTitle: "تم حجز جلسة إرشاد",
       counselingBookedBody: "جلستك مجدولة في {datetime}.",
       counselingBookedBodyFallback: "تم تأكيد جلسة الإرشاد الخاصة بك.",
       identityRequestTitle: "طُلب كشف الهوية",
       identityRequestBody: "طلب عضو هيئة تدريس معرفة هويتك لتقديم دعم أفضل.",
     },
-    faculty: {
+    counselor: {
       highRiskAlertTitle: "تم اكتشاف تنبيه عالي الخطورة",
       highRiskAlertBody: "{incidentType} — اكتشاف تلقائي بالذكاء الاصطناعي، راجع فوراً",
       newCaseTitle: "تم إرسال حالة جديدة",
@@ -788,6 +794,11 @@ export const ar: Dictionary = {
     iosStep3: "اضغط \"إضافة\" — يفتح SafeVoice الآن مثل تطبيق.",
     androidStep1: "اضغط قائمة المتصفح (⋮) في أعلى اليمين.",
     androidStep2: "اختر \"تثبيت التطبيق\" أو \"إضافة إلى الشاشة الرئيسية\".",
+    apkInstallTitle: "تثبيت SafeVoice",
+    apkInstallIntro: "جارٍ تنزيل التطبيق. اتبع هذه الخطوات لتثبيته على هاتفك:",
+    apkStep1: "افتح مجلد التنزيلات واضغط على SafeVoice.apk.",
+    apkStep2: "اضغط تثبيت عند المطالبة.",
+    apkStep3: "إذا طُلب منك ذلك، اسمح بالتثبيت من المتصفح، ثم افتح SafeVoice.",
   },
 
   incident: {

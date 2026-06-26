@@ -10,7 +10,7 @@ interface MeetingCredentials {
   roomName: string;
   jitsiDomain: string;
   userName: string;
-  role: "student" | "faculty";
+  role: "student" | "counselor";
 }
 
 interface VideoMeetingRoomProps {
@@ -214,7 +214,7 @@ export function VideoMeetingRoom({ bookingId, backHref }: VideoMeetingRoomProps)
 
   if (state === "error") {
     return (
-      <div className="flex h-full min-h-[60vh] flex-col items-center justify-center gap-4">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 pt-safe pb-safe">
         <div className="flex items-center gap-2 text-destructive">
           <AlertCircle className="h-5 w-5" />
           <p className="font-medium">{error}</p>
@@ -244,8 +244,8 @@ export function VideoMeetingRoom({ bookingId, backHref }: VideoMeetingRoomProps)
   const showLeave = state === "joining" || state === "joined";
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-zinc-950">
-      <div className="flex shrink-0 items-center justify-between border-b border-zinc-800 px-4 py-2">
+    <div className="fixed inset-x-0 bottom-0 top-safe z-50 flex flex-col bg-zinc-950 pb-safe">
+      <div className="flex shrink-0 items-center justify-between border-b border-zinc-800 px-4 py-2.5">
         <p className="text-sm font-medium text-zinc-100">{t("counseling.meeting.sessionTitle")}</p>
         {showLeave && (
           <Button
