@@ -15,6 +15,14 @@
     margin-top: env(safe-area-inset-top, 0px);
   }
 
+  .top-safe {
+    top: env(safe-area-inset-top, 0px);
+  }
+
+  .h-screen-safe {
+    height: calc(100dvh - env(safe-area-inset-top, 0px));
+  }
+
   /* Extends the element's background into the status bar area */
   .safe-area-top-fill::before {
     content: "";

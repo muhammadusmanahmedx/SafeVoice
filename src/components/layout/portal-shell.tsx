@@ -63,9 +63,9 @@ export function PortalShell({
   const title = t(titleKey);
 
   const sidebar = (
-    <aside className="relative flex h-dvh w-64 shrink-0 flex-col border-e border-border bg-card">
-      {/* Desktop-only safe-area top fill */}
-      <div className="hidden h-0 pt-safe lg:block" />
+    <aside className="relative flex h-full w-64 shrink-0 flex-col border-e border-border bg-card lg:h-dvh">
+      {/* Desktop: pad below status bar when sidebar is in the page flow */}
+      <div className="hidden h-0 shrink-0 pt-safe lg:block" />
 
       <div className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
         <Link href="/" className="flex items-center gap-2.5">
@@ -145,7 +145,7 @@ export function PortalShell({
             className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="fixed inset-y-0 start-0 z-50 lg:hidden">{sidebar}</div>
+          <div className="fixed start-0 bottom-0 top-safe z-50 w-64 lg:hidden">{sidebar}</div>
         </>
       )}
 
