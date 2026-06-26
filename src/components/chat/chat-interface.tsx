@@ -170,7 +170,7 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: () => ({ conversationId: conversationIdRef.current }),
+        body: () => ({ conversationId: conversationIdRef.current, locale }),
         fetch: async (url, options) => {
           const response = await fetch(url, options);
           const convId = response.headers.get("X-Conversation-Id");
@@ -178,7 +178,7 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
           return response;
         },
       }),
-    []
+    [locale]
   );
 
   const { messages, sendMessage, status } = useChat({

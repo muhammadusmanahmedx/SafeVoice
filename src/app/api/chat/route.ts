@@ -7,6 +7,14 @@ import {
 } from "@/lib/ai/chat";
 import { requireApiProfile } from "@/lib/auth/get-profile";
 import { maybeCreateAutoAlert } from "@/lib/safeguarding/auto-alert";
+import { isLocale, type Locale } from "@/lib/i18n";
+
+function resolveLocale(bodyLocale: unknown, acceptLanguage: string | null): Locale {
+  if (typeof bodyLocale === "string" && isLocale(bodyLocale)) return bodyLocale;
+  const header = acceptLanguage?.split(",")[0]?.trim().slice(0, 2);
+  if (header && isLocale(header)) return header;
+  return "en";
+}
 
 export async function POST(req: Request) {
   try {
@@ -16,7 +24,8 @@ export async function POST(req: Request) {
     }
     const profile = auth.profile;
 
-    const { messages, conversationId } = await req.json();
+    const { messages, conversationId, locale: bodyLocale } = await req.json();
+    const locale = resolveLocale(bodyLocale, req.headers.get("accept-language"));
     const uiMessages = messages as UIMessage[];
 
     const supabase = await createClient();
@@ -66,7 +75,7 @@ export async function POST(req: Request) {
     }
 
     const finalConvId = convId;
-    const result = createChatStream(modelMessages, async (fullText) => {
+    const result = createChatStream(modelMessages, locale, async (fullText) => {
       try {
         const riskAssessment = lastUserText
           ? await assessConversationRisk(lastUserText, fullText)
