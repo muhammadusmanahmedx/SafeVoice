@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Shield } from "lucide-react";
+import Image from "next/image";
 import { LanguageToggle } from "@/components/layout/language-toggle";
 import { useLanguage } from "@/components/providers/language-provider";
 
@@ -12,9 +12,7 @@ export function PublicHeader() {
     <header className="sticky top-5 z-50 mx-auto max-w-6xl px-6">
       <div className="flex h-[68px] items-center justify-between rounded-2xl border border-white/60 bg-white/90 px-6 shadow-sm backdrop-blur-md">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#193852]">
-            <Shield className="h-4 w-4 text-white" />
-          </div>
+          <Image src="/logo.png" alt="SafeVoice" width={36} height={36} className="rounded-xl" />
           <span className="text-sm font-bold tracking-tight text-[#0d0d0d]">SafeVoice</span>
         </Link>
         <div className="flex items-center gap-2">

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_Arabic, Noto_Sans_Devanagari } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { InstallPrompt } from "@/components/layout/install-prompt";
+import { NativeShellInit } from "@/components/layout/native-shell-init";
 import { LanguageProvider } from "@/components/providers/language-provider";
 import { TimezoneCookie } from "@/components/timezone-cookie";
 import { LOCALE_COOKIE } from "@/lib/i18n";
@@ -25,7 +26,9 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    // black-translucent: status bar becomes transparent so our navy header
+    // fills behind it; safe-area-inset-top padding keeps text clear of it.
+    statusBarStyle: "black-translucent",
     title: "SafeVoice",
   },
   formatDetection: {
@@ -54,11 +57,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__pwaInstallPrompt=e;window.dispatchEvent(new Event("pwa:install-available"));});window.addEventListener("appinstalled",function(){window.__pwaInstallPrompt=null;window.dispatchEvent(new Event("pwa:installed"));});})();`,
+            __html: `(function(){if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())return;window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__pwaInstallPrompt=e;window.dispatchEvent(new Event("pwa:install-available"));});window.addEventListener("appinstalled",function(){window.__pwaInstallPrompt=null;window.dispatchEvent(new Event("pwa:installed"));});})();`,
           }}
         />
         <ThemeProvider attribute="class" defaultTheme="light" themes={["light", "dark", "calm"]}>
           <LanguageProvider>
+            <NativeShellInit />
             <TimezoneCookie />
             {children}
             <InstallPrompt />

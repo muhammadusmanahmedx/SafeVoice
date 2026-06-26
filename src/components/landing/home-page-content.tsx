@@ -532,9 +532,7 @@ export function HomePageContent() {
       <footer className="border-t border-gray-100 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 sm:flex-row">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#193852]">
-              <Shield className="h-3.5 w-3.5 text-white" />
-            </div>
+            <Image src="/logo.png" alt="SafeVoice" width={28} height={28} className="rounded-lg" />
             <span className="text-sm font-bold text-[#0d0d0d]">SafeVoice</span>
           </Link>
           <p className="text-xs text-gray-400">{t("landing.footer.tagline")}</p>
@@ -544,6 +542,9 @@ export function HomePageContent() {
             </Link>
             <Link href="/register" className="hover:text-[#0d0d0d]">
               {t("landing.footer.getStarted")}
+            </Link>
+            <Link href="/privacy" className="hover:text-[#0d0d0d]">
+              {t("landing.footer.privacy")}
             </Link>
           </div>
         </div>
