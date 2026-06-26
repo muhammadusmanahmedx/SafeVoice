@@ -1,14 +1,17 @@
 "use client";
 
 import { Shield } from "lucide-react";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export function RedirectScreen({ role }: { role: string }) {
+  const { t } = useLanguage();
+
   const label =
     role === "admin"
-      ? "Admin Portal"
+      ? t("portal.admin")
       : role === "faculty"
-      ? "Faculty Portal"
-      : "Student Portal";
+        ? t("portal.faculty")
+        : t("portal.student");
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background gap-4">
@@ -17,7 +20,7 @@ export function RedirectScreen({ role }: { role: string }) {
       </div>
       <div className="text-center">
         <p className="text-sm font-semibold">{label}</p>
-        <p className="mt-1 text-xs text-muted-foreground">Taking you there…</p>
+        <p className="mt-1 text-xs text-muted-foreground">{t("auth.redirectTakingYou")}</p>
       </div>
       <div className="flex gap-1.5">
         {[0, 1, 2].map((i) => (

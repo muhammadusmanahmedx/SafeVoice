@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createCaseFromEscalation } from "@/lib/actions/cases";
+import { useLanguage } from "@/components/providers/language-provider";
+import { getIncidentTypeLabel, getRiskLevelLabel } from "@/lib/i18n/labels";
 import type { EscalationData, RiskAssessment } from "@/types";
 import { ShieldCheck, UserCheck, UserX, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -32,6 +34,7 @@ interface EscalationFlowProps {
 }
 
 export function EscalationFlow({ open, onOpenChange, conversationId, assessment }: EscalationFlowProps) {
+  const { t } = useLanguage();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [identityChoice, setIdentityChoice] = useState<"anonymous" | "identified" | null>(null);
@@ -73,16 +76,15 @@ export function EscalationFlow({ open, onOpenChange, conversationId, assessment 
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-primary" />
-                Additional Support Available
+                {t("student.chat.escalation.offerTitle")}
               </DialogTitle>
               <DialogDescription>
-                It sounds like this situation may benefit from faculty support. Would you like to notify
-                a faculty member who can help?
+                {t("student.chat.escalation.offerDescription")}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={handleClose}>Not now</Button>
-              <Button onClick={() => setStep(1)}>Yes, notify faculty</Button>
+              <Button variant="outline" onClick={handleClose}>{t("student.chat.escalation.notNow")}</Button>
+              <Button onClick={() => setStep(1)}>{t("student.chat.escalation.yesNotify")}</Button>
             </DialogFooter>
           </>
         )}
@@ -91,9 +93,9 @@ export function EscalationFlow({ open, onOpenChange, conversationId, assessment 
         {step === 1 && (
           <>
             <DialogHeader>
-              <DialogTitle>How would you like to report?</DialogTitle>
+              <DialogTitle>{t("student.chat.escalation.identityTitle")}</DialogTitle>
               <DialogDescription>
-                You are always in control. Faculty cannot see your identity unless you choose to share it.
+                {t("student.chat.escalation.identityDescription")}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-3 py-2">
@@ -108,9 +110,9 @@ export function EscalationFlow({ open, onOpenChange, conversationId, assessment 
               >
                 <UserX className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
                 <div>
-                  <p className="font-semibold text-sm">Stay anonymous</p>
+                  <p className="font-semibold text-sm">{t("student.chat.escalation.stayAnonymous")}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Faculty sees the report but not your name. You stay hidden unless you choose later.
+                    {t("student.chat.escalation.stayAnonymousDesc")}
                   </p>
                 </div>
               </button>
@@ -125,16 +127,16 @@ export function EscalationFlow({ open, onOpenChange, conversationId, assessment 
               >
                 <UserCheck className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
                 <div>
-                  <p className="font-semibold text-sm">Share my identity</p>
+                  <p className="font-semibold text-sm">{t("student.chat.escalation.shareIdentity")}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Faculty will know this report is from you — enables more personalised support.
+                    {t("student.chat.escalation.shareIdentityDesc")}
                   </p>
                 </div>
               </button>
             </div>
             <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={() => setStep(0)}>Back</Button>
-              <Button onClick={() => setStep(2)} disabled={!identityChoice}>Continue</Button>
+              <Button variant="outline" onClick={() => setStep(0)}>{t("common.back")}</Button>
+              <Button onClick={() => setStep(2)} disabled={!identityChoice}>{t("common.confirm")}</Button>
             </DialogFooter>
           </>
         )}
@@ -143,30 +145,30 @@ export function EscalationFlow({ open, onOpenChange, conversationId, assessment 
         {step === 2 && (
           <>
             <DialogHeader>
-              <DialogTitle>Incident Details</DialogTitle>
+              <DialogTitle>{t("student.chat.escalation.detailsTitle")}</DialogTitle>
               <DialogDescription>
-                Share what you&apos;re comfortable with. All fields except location are optional.
+                {t("student.chat.escalation.detailsDescription")}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-2">
               <div className="space-y-1.5">
-                <Label className="text-sm">Where is this happening?</Label>
+                <Label className="text-sm">{t("student.chat.escalation.whereHappening")}</Label>
                 <Input
-                  placeholder="e.g. Classroom, Hallway, Online"
+                  placeholder={t("student.chat.escalation.wherePlaceholder")}
                   value={form.location}
                   onChange={(e) => setForm({ ...form, location: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-sm">How long has this been happening?</Label>
+                <Label className="text-sm">{t("student.chat.escalation.howLong")}</Label>
                 <Input
-                  placeholder="e.g. Two weeks, Since September"
+                  placeholder={t("student.chat.escalation.howLongPlaceholder")}
                   value={form.duration}
                   onChange={(e) => setForm({ ...form, duration: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-sm">Who is involved?</Label>
+                <Label className="text-sm">{t("student.chat.escalation.whoInvolved")}</Label>
                 <Select
                   value={form.peopleInvolved}
                   onValueChange={(v) => setForm({ ...form, peopleInvolved: v as EscalationData["peopleInvolved"] })}
@@ -175,15 +177,15 @@ export function EscalationFlow({ open, onOpenChange, conversationId, assessment 
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="student">Student</SelectItem>
-                    <SelectItem value="faculty">Faculty</SelectItem>
-                    <SelectItem value="group">Group</SelectItem>
-                    <SelectItem value="unknown">Unknown</SelectItem>
+                    <SelectItem value="student">{t("student.chat.escalation.peopleStudent")}</SelectItem>
+                    <SelectItem value="faculty">{t("student.chat.escalation.peopleFaculty")}</SelectItem>
+                    <SelectItem value="group">{t("student.chat.escalation.peopleGroup")}</SelectItem>
+                    <SelectItem value="unknown">{t("student.chat.escalation.peopleUnknown")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-sm">Does this affect other students?</Label>
+                <Label className="text-sm">{t("student.chat.escalation.othersAffected")}</Label>
                 <Select
                   value={form.othersAffected ? "yes" : "no"}
                   onValueChange={(v) => setForm({ ...form, othersAffected: v === "yes" })}
@@ -192,15 +194,17 @@ export function EscalationFlow({ open, onOpenChange, conversationId, assessment 
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="yes">Yes</SelectItem>
-                    <SelectItem value="no">No / Unsure</SelectItem>
+                    <SelectItem value="yes">{t("common.yes")}</SelectItem>
+                    <SelectItem value="no">{t("student.chat.escalation.othersAffectedNo")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
-              <Button onClick={() => setStep(3)} disabled={!form.location}>Preview</Button>
+              <Button variant="outline" onClick={() => setStep(1)}>{t("common.back")}</Button>
+              <Button onClick={() => setStep(3)} disabled={!form.location}>
+                {t("student.chat.escalation.preview")}
+              </Button>
             </DialogFooter>
           </>
         )}
@@ -209,26 +213,35 @@ export function EscalationFlow({ open, onOpenChange, conversationId, assessment 
         {step === 3 && (
           <>
             <DialogHeader>
-              <DialogTitle>Review Your Report</DialogTitle>
+              <DialogTitle>{t("student.chat.escalation.reviewTitle")}</DialogTitle>
               <DialogDescription>
-                This will be submitted{" "}
+                {t("student.chat.escalation.reviewDescriptionPrefix")}{" "}
                 <span className="font-medium text-foreground">
-                  {identityChoice === "anonymous" ? "anonymously" : "with your identity"}
+                  {identityChoice === "anonymous"
+                    ? t("student.chat.escalation.reviewDescriptionAnonymousWord")
+                    : t("student.chat.escalation.reviewDescriptionIdentifiedWord")}
                 </span>.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-2 rounded-xl bg-muted/60 p-4 text-sm">
-              <Row label="Type" value={assessment.category.replace("_", " ")} />
-              <Row label="Severity" value={assessment.riskLevel} />
-              <Row label="Summary" value={assessment.summary} />
-              <Row label="Location" value={form.location} />
-              {form.duration && <Row label="Duration" value={form.duration} />}
-              <Row label="Identity" value={identityChoice === "anonymous" ? "Anonymous" : "Shared"} />
+              <Row label={t("common.type")} value={getIncidentTypeLabel(t, assessment.category)} />
+              <Row label={t("common.severity")} value={getRiskLevelLabel(t, assessment.riskLevel)} />
+              <Row label={t("common.summary")} value={assessment.summary} />
+              <Row label={t("common.location")} value={form.location} />
+              {form.duration && <Row label={t("common.duration")} value={form.duration} />}
+              <Row
+                label={t("common.identity")}
+                value={identityChoice === "anonymous" ? t("common.anonymous") : t("common.shared")}
+              />
             </div>
             <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={() => setStep(2)}>Back</Button>
+              <Button variant="outline" onClick={() => setStep(2)}>{t("common.back")}</Button>
               <Button onClick={handleSubmit} disabled={loading}>
-                {loading ? "Submitting…" : identityChoice === "anonymous" ? "Submit Anonymously" : "Submit with Identity"}
+                {loading
+                  ? t("student.chat.escalation.submitting")
+                  : identityChoice === "anonymous"
+                    ? t("student.chat.escalation.submitAnonymously")
+                    : t("student.chat.escalation.submitWithIdentity")}
               </Button>
             </DialogFooter>
           </>
@@ -241,17 +254,16 @@ export function EscalationFlow({ open, onOpenChange, conversationId, assessment 
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
                 <CheckCircle2 className="h-6 w-6 text-green-600" />
               </div>
-              <DialogTitle className="text-center">Report Submitted</DialogTitle>
+              <DialogTitle className="text-center">{t("student.chat.escalation.submittedTitle")}</DialogTitle>
               <DialogDescription className="text-center">
-                A faculty member will review your concern shortly.
-                Check your Cases page for updates and responses.
+                {t("student.chat.escalation.submittedDescription")}
                 {identityChoice === "anonymous"
-                  ? " Your identity remains protected."
-                  : " Your name has been shared with the faculty member."}
+                  ? t("student.chat.escalation.submittedAnonymousNote")
+                  : t("student.chat.escalation.submittedIdentifiedNote")}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button className="w-full" onClick={handleClose}>Done</Button>
+              <Button className="w-full" onClick={handleClose}>{t("common.done")}</Button>
             </DialogFooter>
           </>
         )}

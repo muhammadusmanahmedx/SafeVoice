@@ -1,8 +1,7 @@
 import { requireProfile } from "@/lib/auth/get-profile";
 import { createClient } from "@/lib/supabase/server";
 import { MeetingAccessGate } from "@/components/counseling/meeting-access-gate";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { StudentMeetingErrorView } from "@/components/student/student-meeting-error-view";
 
 interface PageProps {
   params: Promise<{ bookingId: string }>;
@@ -25,14 +24,7 @@ export default async function StudentMeetingPage({ params }: PageProps) {
     .single();
 
   if (!booking) {
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground">Booking not found.</p>
-        <Button asChild variant="outline">
-          <Link href="/counseling">Back</Link>
-        </Button>
-      </div>
-    );
+    return <StudentMeetingErrorView messageKey="common.notFound" />;
   }
 
   const slot = booking.slot as {
@@ -42,14 +34,7 @@ export default async function StudentMeetingPage({ params }: PageProps) {
   };
 
   if (booking.status === "cancelled") {
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground">This session has been cancelled.</p>
-        <Button asChild variant="outline">
-          <Link href="/counseling">Back</Link>
-        </Button>
-      </div>
-    );
+    return <StudentMeetingErrorView messageKey="student.counseling.cancelTitle" />;
   }
 
   return (

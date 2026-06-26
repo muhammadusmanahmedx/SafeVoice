@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Locale } from "@/lib/i18n";
 
 interface SpeechRecognitionResult {
   readonly isFinal: boolean;
@@ -31,6 +32,11 @@ interface SpeechRecognitionInstance extends EventTarget {
 
 type SpeechRecognitionCtor = new () => SpeechRecognitionInstance;
 
+export type SpeechErrorKey =
+  | "student.chat.speechNotSupported"
+  | "student.chat.speechMicDenied"
+  | "student.chat.speechCaptureFailed";
+
 function getSpeechRecognition(): SpeechRecognitionCtor | null {
   if (typeof window === "undefined") return null;
   const w = window as Window & {
@@ -40,10 +46,16 @@ function getSpeechRecognition(): SpeechRecognitionCtor | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
-export function useSpeechRecognition() {
+function speechLang(locale: Locale): string {
+  if (locale === "ar") return "ar-SA";
+  if (locale === "hi") return "hi-IN";
+  return "en-US";
+}
+
+export function useSpeechRecognition(locale: Locale = "en") {
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errorKey, setErrorKey] = useState<SpeechErrorKey | null>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   useEffect(() => {
@@ -59,15 +71,15 @@ export function useSpeechRecognition() {
     (onTranscript: (text: string, isFinal: boolean) => void) => {
       const Ctor = getSpeechRecognition();
       if (!Ctor) {
-        setError("Speech recognition is not supported in this browser.");
+        setErrorKey("student.chat.speechNotSupported");
         return;
       }
 
-      setError(null);
+      setErrorKey(null);
       const recognition = new Ctor();
       recognition.continuous = true;
       recognition.interimResults = true;
-      recognition.lang = "en-US";
+      recognition.lang = speechLang(locale);
 
       recognition.onresult = (event) => {
         let interim = "";
@@ -84,10 +96,10 @@ export function useSpeechRecognition() {
       recognition.onerror = (event) => {
         const code = (event as Event & { error?: string }).error;
         if (code !== "aborted") {
-          setError(
+          setErrorKey(
             code === "not-allowed"
-              ? "Microphone access denied. Please allow microphone permission."
-              : "Could not capture speech. Try again."
+              ? "student.chat.speechMicDenied"
+              : "student.chat.speechCaptureFailed"
           );
         }
         setIsListening(false);
@@ -99,7 +111,7 @@ export function useSpeechRecognition() {
       recognition.start();
       setIsListening(true);
     },
-    []
+    [locale]
   );
 
   const toggle = useCallback(
@@ -110,5 +122,5 @@ export function useSpeechRecognition() {
     [isListening, start, stop]
   );
 
-  return { isListening, isSupported, error, toggle, stop };
+  return { isListening, isSupported, errorKey, toggle, stop };
 }

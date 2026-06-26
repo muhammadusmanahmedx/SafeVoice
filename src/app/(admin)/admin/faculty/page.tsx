@@ -1,6 +1,6 @@
 import { requireProfile } from "@/lib/auth/get-profile";
 import { createClient } from "@/lib/supabase/server";
-import { FacultyManagement } from "@/components/admin/faculty-management";
+import { AdminFacultyView } from "@/components/admin/admin-faculty-view";
 
 export default async function AdminFacultyPage() {
   const profile = await requireProfile(["admin"]);
@@ -21,13 +21,5 @@ export default async function AdminFacultyPage() {
       .limit(10),
   ]);
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Faculty Management</h1>
-        <p className="text-sm text-muted-foreground">Manage faculty accounts and registration codes</p>
-      </div>
-      <FacultyManagement faculty={faculty ?? []} codes={codes ?? []} />
-    </div>
-  );
+  return <AdminFacultyView faculty={faculty ?? []} codes={codes ?? []} />;
 }

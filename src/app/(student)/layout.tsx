@@ -2,12 +2,12 @@ import { PortalShell } from "@/components/layout/portal-shell";
 import { requireProfile } from "@/lib/auth/get-profile";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: "layout-dashboard" as const },
-  { href: "/chat", label: "AI Assistant", icon: "message-circle" as const },
-  { href: "/mood", label: "Mood", icon: "smile" as const },
-  { href: "/resources", label: "Resources", icon: "book-open" as const },
-  { href: "/counseling", label: "Counseling", icon: "calendar" as const },
-  { href: "/cases", label: "My Cases", icon: "folder-open" as const },
+  { href: "/dashboard", labelKey: "nav.dashboard", icon: "layout-dashboard" as const },
+  { href: "/chat", labelKey: "nav.aiAssistant", icon: "message-circle" as const },
+  { href: "/mood", labelKey: "nav.mood", icon: "smile" as const },
+  { href: "/resources", labelKey: "nav.resources", icon: "book-open" as const },
+  { href: "/counseling", labelKey: "nav.counseling", icon: "calendar" as const },
+  { href: "/cases", labelKey: "nav.myCases", icon: "folder-open" as const },
 ];
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
@@ -15,8 +15,8 @@ export default async function StudentLayout({ children }: { children: React.Reac
 
   return (
     <PortalShell
-      title="Student Portal"
-      subtitle={profile.institutions?.name ?? "Your institution"}
+      titleKey="portal.student"
+      subtitle={profile.institutions?.name ?? undefined}
       navItems={navItems}
       userId={profile.id}
       role="student"

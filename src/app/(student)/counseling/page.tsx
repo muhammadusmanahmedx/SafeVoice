@@ -1,8 +1,7 @@
 import { requireProfile } from "@/lib/auth/get-profile";
 import { createClient } from "@/lib/supabase/server";
-import { CounselingBookingPanel } from "@/components/student/counseling-booking";
+import { CounselingPageView } from "@/components/student/counseling-page-view";
 import type { WeeklyAvailabilityRange } from "@/lib/counseling/availability-frames";
-import { Calendar } from "lucide-react";
 
 export default async function CounselingPage() {
   const profile = await requireProfile(["student"]);
@@ -54,7 +53,8 @@ export default async function CounselingPage() {
       slot_at: s.slot_at,
       duration_minutes: s.duration_minutes,
       counselor_name:
-        (s.faculty as { display_name: string | null } | null)?.display_name ?? "Counselor",
+        (s.faculty as { display_name: string | null } | null)?.display_name ??
+        "Counselor",
     }));
 
   const myBookings = (bookings ?? [])
@@ -92,24 +92,10 @@ export default async function CounselingPage() {
   }));
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
-          <Calendar className="h-6 w-6 text-primary" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold">Book a Counseling Session</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Select a highlighted date, choose an availability window, then pick a time.
-          </p>
-        </div>
-      </div>
-
-      <CounselingBookingPanel
-        availableSlots={availableSlots}
-        weeklyRanges={weeklyRanges}
-        myBookings={myBookings}
-      />
-    </div>
+    <CounselingPageView
+      availableSlots={availableSlots}
+      weeklyRanges={weeklyRanges}
+      myBookings={myBookings}
+    />
   );
 }

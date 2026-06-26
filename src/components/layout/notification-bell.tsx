@@ -9,10 +9,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/components/providers/language-provider";
+import { formatMessage } from "@/lib/i18n/labels";
 
 interface Notification {
   id: string;
-  type: "message" | "identity_request" | "identity_accepted" | "identity_declined" | "new_case";
+  type: string;
   title: string;
   body: string;
   time: string;
@@ -26,21 +28,23 @@ interface Props {
 }
 
 export function NotificationBell({ userId, role }: Props) {
+  const { locale, t } = useLanguage();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
     fetchNotifications();
-    // Poll every 30s
     const id = setInterval(fetchNotifications, 30_000);
     return () => clearInterval(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [userId, locale]);
 
   async function fetchNotifications() {
     try {
-      const res = await fetch(`/api/notifications?role=${role ?? "student"}`);
+      const res = await fetch(`/api/notifications?role=${role ?? "student"}`, {
+        headers: { "Accept-Language": locale },
+      });
       if (res.ok) {
         const data = await res.json();
         setNotifications(data.notifications ?? []);
@@ -57,24 +61,24 @@ export function NotificationBell({ userId, role }: Props) {
           <Bell className="h-4 w-4" />
           {unread > 0 && (
             <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
-              {unread > 9 ? "9+" : unread}
+              {unread > 9 ? t("notifications.unreadOverflow") : unread}
             </span>
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 p-0">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <p className="text-sm font-semibold">Notifications</p>
+          <p className="text-sm font-semibold">{t("notifications.title")}</p>
           {unread > 0 && (
             <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-              {unread} new
+              {formatMessage(t("notifications.newCount"), { count: unread })}
             </span>
           )}
         </div>
         <div className="max-h-80 overflow-y-auto">
           {notifications.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-              No notifications yet
+              {t("notifications.empty")}
             </div>
           ) : (
             notifications.map((n) => (

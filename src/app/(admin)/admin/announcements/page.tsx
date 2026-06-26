@@ -1,6 +1,6 @@
 import { requireProfile } from "@/lib/auth/get-profile";
 import { createClient } from "@/lib/supabase/server";
-import { AnnouncementsManager } from "@/components/admin/announcements-manager";
+import { AdminAnnouncementsView } from "@/components/admin/admin-announcements-view";
 
 export default async function AdminAnnouncementsPage() {
   const profile = await requireProfile(["admin"]);
@@ -12,13 +12,5 @@ export default async function AdminAnnouncementsPage() {
     .eq("institution_id", profile.institution_id)
     .order("published_at", { ascending: false });
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Announcements</h1>
-        <p className="text-sm text-muted-foreground">Publish updates visible to faculty members</p>
-      </div>
-      <AnnouncementsManager announcements={announcements ?? []} />
-    </div>
-  );
+  return <AdminAnnouncementsView announcements={announcements ?? []} />;
 }

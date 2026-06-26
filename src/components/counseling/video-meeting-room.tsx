@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PhoneOff, Loader2, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface MeetingCredentials {
   roomName: string;
@@ -39,6 +40,7 @@ function loadJitsiScript(domain: string): Promise<void> {
 
 export function VideoMeetingRoom({ bookingId, backHref }: VideoMeetingRoomProps) {
   const router = useRouter();
+  const { t } = useLanguage();
   const [state, setState] = useState<CallState>("loading");
   const [error, setError] = useState<string | null>(null);
   const [creds, setCreds] = useState<MeetingCredentials | null>(null);
@@ -63,7 +65,6 @@ export function VideoMeetingRoom({ bookingId, backHref }: VideoMeetingRoomProps)
       jitsiRef.current = null;
     }
 
-    // Wipe the iframe so Jitsi's post-call / welcome screen never stays visible
     if (containerRef.current) {
       containerRef.current.replaceChildren();
     }
@@ -79,13 +80,13 @@ export function VideoMeetingRoom({ bookingId, backHref }: VideoMeetingRoomProps)
     });
     const json = await res.json();
     if (!res.ok) {
-      setError(json.error ?? "Could not load meeting credentials.");
+      setError(json.error ?? t("counseling.meeting.credentialsError"));
       setState("error");
       return;
     }
     setCreds(json as MeetingCredentials);
     setState("joining");
-  }, [bookingId]);
+  }, [bookingId, t]);
 
   useEffect(() => {
     fetchCreds();
@@ -135,20 +136,53 @@ export function VideoMeetingRoom({ bookingId, backHref }: VideoMeetingRoomProps)
             enableLobbyChat: false,
             disableProfile: true,
             hideConferenceSubject: true,
+            enableIceRestart: false,
+            enableForcedReload: false,
           },
           interfaceConfigOverwrite: {
             TOOLBAR_BUTTONS: ["microphone", "camera", "hangup", "tileview"],
             SHOW_JITSI_WATERMARK: false,
             SHOW_WATERMARK_FOR_GUESTS: false,
             DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+            CONNECTION_INDICATOR_DISABLED: true,
           },
         });
 
         jitsiRef.current = api;
 
+        const tearDownJitsi = () => {
+          if (jitsiRef.current) {
+            try {
+              jitsiRef.current.dispose();
+            } catch {
+              // ignore
+            }
+            jitsiRef.current = null;
+          }
+          if (containerRef.current) {
+            containerRef.current.replaceChildren();
+          }
+        };
+
         const revealTimer = setTimeout(() => {
           if (mountedRef.current && !hasExitedRef.current) setState("joined");
         }, 8000);
+
+        api.addListener("errorOccurred", (err: { isFatal?: boolean; message?: string }) => {
+          if (!err.isFatal || hasExitedRef.current) return;
+          clearTimeout(revealTimer);
+          tearDownJitsi();
+
+          if (hasJoinedRef.current) {
+            exitSession();
+            return;
+          }
+
+          if (mountedRef.current) {
+            setError(err.message ?? t("counseling.meeting.connectError"));
+            setState("error");
+          }
+        });
 
         api.addListener("videoConferenceJoined", () => {
           hasJoinedRef.current = true;
@@ -171,12 +205,12 @@ export function VideoMeetingRoom({ bookingId, backHref }: VideoMeetingRoomProps)
         console.error(err);
         initializedRef.current = false;
         if (mountedRef.current && !hasExitedRef.current) {
-          setError("Failed to start video call. Check camera/mic permissions.");
+          setError(t("counseling.meeting.startError"));
           setState("error");
         }
       }
     })();
-  }, [state, creds, exitSession]);
+  }, [state, creds, exitSession, t]);
 
   if (state === "error") {
     return (
@@ -185,9 +219,23 @@ export function VideoMeetingRoom({ bookingId, backHref }: VideoMeetingRoomProps)
           <AlertCircle className="h-5 w-5" />
           <p className="font-medium">{error}</p>
         </div>
-        <Button variant="outline" onClick={() => router.replace(backHref)}>
-          Back
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="default"
+            onClick={() => {
+              initializedRef.current = false;
+              hasJoinedRef.current = false;
+              hasExitedRef.current = false;
+              setError(null);
+              fetchCreds();
+            }}
+          >
+            {t("common.tryAgain")}
+          </Button>
+          <Button variant="outline" onClick={() => router.replace(backHref)}>
+            {t("common.back")}
+          </Button>
+        </div>
       </div>
     );
   }
@@ -198,7 +246,7 @@ export function VideoMeetingRoom({ bookingId, backHref }: VideoMeetingRoomProps)
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-zinc-950">
       <div className="flex shrink-0 items-center justify-between border-b border-zinc-800 px-4 py-2">
-        <p className="text-sm font-medium text-zinc-100">Counseling Session</p>
+        <p className="text-sm font-medium text-zinc-100">{t("counseling.meeting.sessionTitle")}</p>
         {showLeave && (
           <Button
             size="sm"
@@ -207,16 +255,16 @@ export function VideoMeetingRoom({ bookingId, backHref }: VideoMeetingRoomProps)
             className="gap-1.5"
           >
             <PhoneOff className="h-4 w-4" />
-            Leave
+            {t("common.leave")}
           </Button>
         )}
       </div>
       <div className="relative flex-1">
         <div ref={containerRef} className="absolute inset-0 h-full w-full" />
         {showSpinner && (
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-4 bg-zinc-950/90">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-zinc-950">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-zinc-400">Connecting to the session…</p>
+            <p className="text-sm text-zinc-400">{t("counseling.meeting.connecting")}</p>
           </div>
         )}
       </div>

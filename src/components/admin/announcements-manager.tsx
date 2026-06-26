@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { createAnnouncement, deleteAnnouncement } from "@/lib/actions/admin";
 import { formatDate } from "@/lib/utils";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface AnnouncementsManagerProps {
   announcements: {
@@ -19,6 +20,7 @@ interface AnnouncementsManagerProps {
 }
 
 export function AnnouncementsManager({ announcements }: AnnouncementsManagerProps) {
+  const { t } = useLanguage();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,17 +37,17 @@ export function AnnouncementsManager({ announcements }: AnnouncementsManagerProp
   return (
     <div className="space-y-8">
       <div className="glass-card space-y-4 p-6">
-        <h2 className="font-semibold">Publish Announcement</h2>
+        <h2 className="font-semibold">{t("admin.announcements.publishTitle")}</h2>
         <div className="space-y-2">
-          <Label htmlFor="title">Title</Label>
+          <Label htmlFor="title">{t("common.title")}</Label>
           <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="content">Content</Label>
+          <Label htmlFor="content">{t("common.content")}</Label>
           <Textarea id="content" value={content} onChange={(e) => setContent(e.target.value)} rows={4} />
         </div>
         <Button onClick={handleCreate} disabled={loading}>
-          {loading ? "Publishing..." : "Publish to Faculty"}
+          {loading ? t("admin.announcements.publishing") : t("admin.announcements.publishToFaculty")}
         </Button>
       </div>
 
@@ -59,13 +61,13 @@ export function AnnouncementsManager({ announcements }: AnnouncementsManagerProp
                 <p className="mt-2 text-xs text-muted-foreground">{formatDate(a.published_at)}</p>
               </div>
               <Button variant="ghost" size="sm" onClick={() => deleteAnnouncement(a.id)}>
-                Delete
+                {t("common.delete")}
               </Button>
             </CardContent>
           </Card>
         ))}
         {announcements.length === 0 && (
-          <p className="text-sm text-muted-foreground">No announcements yet.</p>
+          <p className="text-sm text-muted-foreground">{t("admin.announcements.empty")}</p>
         )}
       </div>
     </div>

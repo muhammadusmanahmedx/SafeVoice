@@ -1,6 +1,7 @@
 import { requireProfile } from "@/lib/auth/get-profile";
 import { createClient } from "@/lib/supabase/server";
 import { ChatInterface } from "@/components/chat/chat-interface";
+import { ChatPageHeader } from "@/components/student/chat-page-header";
 
 export default async function ChatPage({
   searchParams,
@@ -27,13 +28,8 @@ export default async function ChatPage({
   }
 
   return (
-    <div className="flex h-full flex-col gap-4">
-      <div>
-        <h1 className="text-xl font-bold tracking-tight">AI Wellbeing Assistant</h1>
-        <p className="text-sm text-muted-foreground">
-          Private and confidential — everything you share stays between you and SafeVoice
-        </p>
-      </div>
+    <div className="flex h-full min-h-0 flex-col gap-4">
+      <ChatPageHeader />
       <ChatInterface initialConversationId={id} initialMessages={initialMessages} />
     </div>
   );

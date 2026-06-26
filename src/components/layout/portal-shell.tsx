@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { LanguageToggle } from "@/components/layout/language-toggle";
+import { useLanguage } from "@/components/providers/language-provider";
 import { signOut } from "@/lib/auth/actions";
 import {
   Bell, BookOpen, Calendar, FileBarChart, FolderOpen, LayoutDashboard,
@@ -31,10 +33,14 @@ const NAV_ICONS = {
 
 export type NavIconName = keyof typeof NAV_ICONS;
 
-interface NavItem { href: string; label: string; icon: NavIconName }
+interface NavItem {
+  href: string;
+  labelKey: string;
+  icon: NavIconName;
+}
 
 interface PortalShellProps {
-  title: string;
+  titleKey: string;
   subtitle?: string;
   navItems: NavItem[];
   children: React.ReactNode;
@@ -42,13 +48,21 @@ interface PortalShellProps {
   role?: string;
 }
 
-export function PortalShell({ title, subtitle, navItems, children, userId, role }: PortalShellProps) {
+export function PortalShell({
+  titleKey,
+  subtitle,
+  navItems,
+  children,
+  userId,
+  role,
+}: PortalShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useLanguage();
+  const title = t(titleKey);
 
   const sidebar = (
-    <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-border bg-card">
-      {/* Logo + notification */}
+    <aside className="flex h-screen w-60 shrink-0 flex-col border-e border-border bg-card">
       <div className="flex h-14 items-center justify-between border-b border-border px-4">
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
@@ -67,14 +81,12 @@ export function PortalShell({ title, subtitle, navItems, children, userId, role 
         </div>
       </div>
 
-      {/* Institution */}
       {subtitle && (
         <div className="border-b border-border px-4 py-2.5">
           <p className="truncate text-xs font-medium text-muted-foreground">{subtitle}</p>
         </div>
       )}
 
-      {/* Nav */}
       <nav className="flex-1 overflow-y-auto p-2">
         <div className="space-y-0.5">
           {navItems.map((item) => {
@@ -94,22 +106,26 @@ export function PortalShell({ title, subtitle, navItems, children, userId, role 
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}
         </div>
       </nav>
 
-      {/* Bottom */}
       <div className="border-t border-border p-2">
         <div className="flex items-center gap-1">
+          <LanguageToggle />
           <ThemeToggle />
           <form action={signOut} className="flex-1">
-            <Button variant="ghost" size="sm" type="submit"
-              className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
+            <Button
+              variant="ghost"
+              size="sm"
+              type="submit"
+              className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+            >
               <LogOut className="h-4 w-4" />
-              Sign out
+              {t("common.signOut")}
             </Button>
           </form>
         </div>
@@ -119,36 +135,38 @@ export function PortalShell({ title, subtitle, navItems, children, userId, role 
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Desktop sidebar — always visible, never scrolls */}
-      <div className="hidden lg:flex">{sidebar}</div>
+      <div className="order-1 hidden lg:flex rtl:order-2">{sidebar}</div>
 
-      {/* Mobile overlay sidebar */}
       {mobileOpen && (
         <>
-          <div className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden" onClick={() => setMobileOpen(false)} />
-          <div className="fixed inset-y-0 left-0 z-50 lg:hidden">{sidebar}</div>
+          <div
+            className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div className="fixed inset-y-0 start-0 z-50 lg:hidden">{sidebar}</div>
         </>
       )}
 
-      {/* Main — this is the ONLY thing that scrolls */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        {/* Mobile top bar */}
-        <header className="flex h-14 shrink-0 items-center border-b border-border px-4 lg:hidden">
-          <Button variant="ghost" size="icon" className="mr-3" onClick={() => setMobileOpen(true)}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
-              <Shield className="h-4 w-4 text-white" />
+      <div className="order-2 flex min-w-0 flex-1 flex-col overflow-hidden rtl:order-1">
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4 pt-safe lg:hidden">
+          <div className="flex items-center">
+            <Button variant="ghost" size="icon" className="me-3" onClick={() => setMobileOpen(true)}>
+              <Menu className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
+                <Shield className="h-4 w-4 text-white" />
+              </div>
+              <span className="text-sm font-semibold">{title}</span>
             </div>
-            <span className="text-sm font-semibold">{title}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <LanguageToggle />
+            <ThemeToggle />
           </div>
         </header>
 
-        {/* Scrollable content */}
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
+        <main className="flex-1 min-h-0 overflow-y-auto p-4 pb-safe sm:p-6">{children}</main>
       </div>
     </div>
   );

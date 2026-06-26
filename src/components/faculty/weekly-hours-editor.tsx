@@ -23,11 +23,22 @@ import {
 } from "@/lib/counseling/weekly-hours";
 import { cn } from "@/lib/utils";
 import { Copy, Plus, RefreshCw, X } from "lucide-react";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface WeeklyHoursEditorProps {
   initialRows: { day_of_week: number; start_time: string; end_time: string }[];
   initialDuration: number;
 }
+
+const WEEKDAY_NAME_KEYS = [
+  "faculty.weeklyHours.weekdays.sunday",
+  "faculty.weeklyHours.weekdays.monday",
+  "faculty.weeklyHours.weekdays.tuesday",
+  "faculty.weeklyHours.weekdays.wednesday",
+  "faculty.weeklyHours.weekdays.thursday",
+  "faculty.weeklyHours.weekdays.friday",
+  "faculty.weeklyHours.weekdays.saturday",
+] as const;
 
 function defaultRange(): TimeRange {
   return { start: "09:00", end: "17:00" };
@@ -35,6 +46,7 @@ function defaultRange(): TimeRange {
 
 export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursEditorProps) {
   const router = useRouter();
+  const { t } = useLanguage();
   const [schedule, setSchedule] = useState<WeeklySchedule>(() =>
     initialRows.length > 0 ? scheduleFromDbRows(initialRows) : emptySchedule()
   );
@@ -44,6 +56,10 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
   const [saved, setSaved] = useState(false);
   const [copyFromDay, setCopyFromDay] = useState<number | null>(null);
   const [copyTargets, setCopyTargets] = useState<Set<number>>(new Set());
+
+  function weekdayName(day: number) {
+    return t(WEEKDAY_NAME_KEYS[day] ?? WEEKDAY_NAME_KEYS[0]);
+  }
 
   function updateRange(day: number, index: number, field: "start" | "end", value: string) {
     setSchedule((prev) => {
@@ -118,39 +134,37 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
         <div>
           <div className="flex items-center gap-2">
             <RefreshCw className="h-4 w-4 text-muted-foreground" />
-            <h2 className="text-base font-semibold">Weekly hours</h2>
+            <h2 className="text-base font-semibold">{t("faculty.weeklyHours.title")}</h2>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Set when you are typically available for counseling sessions each week.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("faculty.weeklyHours.description")}</p>
         </div>
         <div className="space-y-1.5 sm:w-44">
-          <Label className="text-xs">Session length</Label>
+          <Label className="text-xs">{t("faculty.weeklyHours.sessionLength")}</Label>
           <Select value={duration} onValueChange={(v) => { setDuration(v); setSaved(false); }}>
             <SelectTrigger className="h-9">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="30">30 minutes</SelectItem>
-              <SelectItem value="45">45 minutes</SelectItem>
-              <SelectItem value="60">60 minutes</SelectItem>
+              <SelectItem value="30">{t("faculty.weeklyHours.minutes30")}</SelectItem>
+              <SelectItem value="45">{t("faculty.weeklyHours.minutes45")}</SelectItem>
+              <SelectItem value="60">{t("faculty.weeklyHours.minutes60")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
       <div className="space-y-1">
-        {WEEKDAYS.map(({ day, letter, name }) => {
+        {WEEKDAYS.map(({ day, letter }) => {
           const ranges = schedule[day];
           const overlaps = getOverlappingIndices(ranges);
           const isCopyOpen = copyFromDay === day;
+          const name = weekdayName(day);
 
           return (
             <div
               key={day}
               className="relative flex gap-3 border-b border-border/60 py-4 last:border-0"
             >
-              {/* Day badge */}
               <div
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#193852] text-sm font-semibold text-white"
                 title={name}
@@ -158,7 +172,6 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
                 {letter}
               </div>
 
-              {/* Time ranges */}
               <div className="min-w-0 flex-1 space-y-2">
                 {ranges.length === 0 ? (
                   <button
@@ -166,7 +179,7 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
                     onClick={() => addRange(day)}
                     className="text-sm text-muted-foreground hover:text-foreground"
                   >
-                    Unavailable
+                    {t("faculty.weeklyHours.unavailable")}
                   </button>
                 ) : (
                   ranges.map((range, index) => (
@@ -197,7 +210,7 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
                           size="icon"
                           className="h-8 w-8 text-muted-foreground hover:text-destructive"
                           onClick={() => removeRange(day, index)}
-                          title="Remove"
+                          title={t("faculty.weeklyHours.remove")}
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -209,7 +222,7 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
                               size="icon"
                               className="h-8 w-8 text-muted-foreground"
                               onClick={() => addRange(day)}
-                              title="Add another time range"
+                              title={t("faculty.weeklyHours.addTimeRange")}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -220,7 +233,7 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
                                 size="icon"
                                 className="h-8 w-8 text-muted-foreground"
                                 onClick={() => (isCopyOpen ? setCopyFromDay(null) : openCopy(day))}
-                                title="Copy times to other days"
+                                title={t("faculty.weeklyHours.copyTimesTo")}
                               >
                                 <Copy className="h-4 w-4" />
                               </Button>
@@ -228,10 +241,10 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
                               {isCopyOpen && (
                                 <div className="absolute right-0 top-9 z-50 w-56 rounded-xl border border-border bg-card p-3 shadow-lg">
                                   <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                    Copy times to…
+                                    {t("faculty.weeklyHours.copyTimesToLabel")}
                                   </p>
                                   <div className="space-y-1">
-                                    {WEEKDAYS.map(({ day: d, name: dayName }) => (
+                                    {WEEKDAYS.map(({ day: d }) => (
                                       <label
                                         key={d}
                                         className={cn(
@@ -239,7 +252,7 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
                                           d === day && "opacity-50"
                                         )}
                                       >
-                                        <span>{dayName}</span>
+                                        <span>{weekdayName(d)}</span>
                                         <input
                                           type="checkbox"
                                           disabled={d === day}
@@ -257,7 +270,7 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
                                     onClick={applyCopy}
                                     disabled={copyTargets.size === 0}
                                   >
-                                    Apply
+                                    {t("common.apply")}
                                   </Button>
                                 </div>
                               )}
@@ -266,9 +279,7 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
                         )}
                       </div>
                       {overlaps.has(index) && (
-                        <p className="mt-1 text-xs text-amber-600">
-                          Times overlap with another set of times.
-                        </p>
+                        <p className="mt-1 text-xs text-amber-600">{t("faculty.weeklyHours.overlapWarning")}</p>
                       )}
                     </div>
                   ))
@@ -294,11 +305,9 @@ export function WeeklyHoursEditor({ initialRows, initialDuration }: WeeklyHoursE
 
       <div className="flex items-center gap-3 border-t border-border pt-4">
         <Button onClick={handleSave} disabled={loading}>
-          {loading ? "Saving…" : saved ? "Saved!" : "Save weekly hours"}
+          {loading ? t("faculty.weeklyHours.saving") : saved ? t("faculty.weeklyHours.saved") : t("faculty.weeklyHours.saveWeeklyHours")}
         </Button>
-        <p className="text-xs text-muted-foreground">
-          Student bookable slots are generated for the next 8 weeks when you save.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("faculty.weeklyHours.saveHint")}</p>
       </div>
     </div>
   );

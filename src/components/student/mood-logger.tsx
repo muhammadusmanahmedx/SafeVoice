@@ -1,15 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { MOOD_OPTIONS } from "@/types";
 import type { MoodLevel } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { logMood } from "@/lib/actions/mood";
+import { useLanguage } from "@/components/providers/language-provider";
+import { getMoodOptions } from "@/lib/i18n/labels";
 import { cn } from "@/lib/utils";
 
 export function MoodLogger() {
+  const { t } = useLanguage();
+  const moodOptions = getMoodOptions(t);
   const [selected, setSelected] = useState<MoodLevel | null>(null);
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +30,7 @@ export function MoodLogger() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-5 gap-3">
-        {MOOD_OPTIONS.map((option) => (
+        {moodOptions.map((option) => (
           <button
             key={option.value}
             type="button"
@@ -46,17 +49,17 @@ export function MoodLogger() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="mood-note">What contributed to today&apos;s mood? (optional)</Label>
+        <Label htmlFor="mood-note">{t("student.mood.noteLabel")}</Label>
         <Textarea
           id="mood-note"
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Share anything you'd like..."
+          placeholder={t("student.mood.notePlaceholder")}
         />
       </div>
 
       <Button onClick={handleSubmit} disabled={!selected || loading} className="w-full sm:w-auto">
-        {loading ? "Saving..." : saved ? "Saved!" : "Log Mood"}
+        {loading ? t("student.mood.saving") : saved ? t("student.mood.saved") : t("student.mood.logMood")}
       </Button>
     </div>
   );

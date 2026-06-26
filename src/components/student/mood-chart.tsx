@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface MoodChartProps {
   data: { logged_at: string; mood: number }[];
@@ -18,6 +19,7 @@ interface MoodChartProps {
 }
 
 export function MoodChart({ data, title }: MoodChartProps) {
+  const { t } = useLanguage();
   const chartData = data.map((d) => ({
     date: format(new Date(d.logged_at), "MMM d"),
     mood: d.mood,
@@ -30,9 +32,7 @@ export function MoodChart({ data, title }: MoodChartProps) {
       </CardHeader>
       <CardContent>
         {chartData.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            No mood data yet. Start logging to see trends.
-          </p>
+          <p className="py-8 text-center text-sm text-muted-foreground">{t("student.mood.chartEmpty")}</p>
         ) : (
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={chartData}>

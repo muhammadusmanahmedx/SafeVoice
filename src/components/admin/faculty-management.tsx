@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { generateFacultyCode, toggleFacultyActive } from "@/lib/actions/admin";
 import { formatDate } from "@/lib/utils";
+import { useLanguage } from "@/components/providers/language-provider";
+import { formatMessage } from "@/lib/i18n/labels";
 
 interface FacultyManagementProps {
   faculty: {
@@ -24,6 +26,7 @@ interface FacultyManagementProps {
 }
 
 export function FacultyManagement({ faculty, codes }: FacultyManagementProps) {
+  const { t } = useLanguage();
   const [newCode, setNewCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -38,15 +41,15 @@ export function FacultyManagement({ faculty, codes }: FacultyManagementProps) {
     <div className="space-y-8">
       <div>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Registration Codes</h2>
+          <h2 className="text-lg font-semibold">{t("admin.faculty.registrationCodes")}</h2>
           <Button onClick={handleGenerateCode} disabled={loading}>
-            {loading ? "Generating..." : "Generate Code"}
+            {loading ? t("admin.faculty.generating") : t("admin.faculty.generateCode")}
           </Button>
         </div>
         {newCode && (
           <Card className="mt-4 border-primary/30 bg-primary/5">
             <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">New faculty code (share securely):</p>
+              <p className="text-sm text-muted-foreground">{t("admin.faculty.newCodeLabel")}</p>
               <p className="mt-1 font-mono text-lg font-bold">{newCode}</p>
             </CardContent>
           </Card>
@@ -57,9 +60,9 @@ export function FacultyManagement({ faculty, codes }: FacultyManagementProps) {
               <span className="font-mono">{code.code}</span>
               <div className="flex items-center gap-2">
                 {code.used_by ? (
-                  <Badge variant="secondary">Used</Badge>
+                  <Badge variant="secondary">{t("common.used")}</Badge>
                 ) : (
-                  <Badge variant="outline">Available</Badge>
+                  <Badge variant="outline">{t("common.available")}</Badge>
                 )}
                 <span className="text-xs text-muted-foreground">{formatDate(code.created_at)}</span>
               </div>
@@ -69,30 +72,32 @@ export function FacultyManagement({ faculty, codes }: FacultyManagementProps) {
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold">Faculty Accounts</h2>
+        <h2 className="text-lg font-semibold">{t("admin.faculty.facultyAccounts")}</h2>
         <div className="mt-4 space-y-2">
           {faculty.map((f) => (
             <div key={f.id} className="flex items-center justify-between rounded-xl bg-muted/50 p-4">
               <div>
-                <p className="font-medium">{f.display_name ?? "Unnamed"}</p>
-                <p className="text-xs text-muted-foreground">Joined {formatDate(f.created_at)}</p>
+                <p className="font-medium">{f.display_name ?? t("common.unnamed")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {formatMessage(t("admin.faculty.joined"), { date: formatDate(f.created_at) })}
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant={f.is_active ? "default" : "destructive"}>
-                  {f.is_active ? "Active" : "Disabled"}
+                  {f.is_active ? t("common.active") : t("common.disabled")}
                 </Badge>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => toggleFacultyActive(f.id, !f.is_active)}
                 >
-                  {f.is_active ? "Disable" : "Enable"}
+                  {f.is_active ? t("common.disable") : t("common.enable")}
                 </Button>
               </div>
             </div>
           ))}
           {faculty.length === 0 && (
-            <p className="text-sm text-muted-foreground">No faculty registered yet.</p>
+            <p className="text-sm text-muted-foreground">{t("admin.faculty.noFaculty")}</p>
           )}
         </div>
       </div>

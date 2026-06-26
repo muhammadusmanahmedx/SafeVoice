@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { requireProfile } from "@/lib/auth/get-profile";
 import { createClient } from "@/lib/supabase/server";
-import { FacultyCaseDetail } from "@/components/faculty/case-detail";
+import { FacultyCaseDetailView } from "@/components/faculty/faculty-case-detail-view";
+import type { CaseStatus } from "@/types";
 
 export default async function FacultyCaseDetailPage({
   params,
@@ -20,7 +20,7 @@ export default async function FacultyCaseDetailPage({
     .single();
 
   if (!caseData) {
-    return <p className="p-6 text-sm text-muted-foreground">Case not found</p>;
+    return <FacultyCaseDetailView notFound />;
   }
 
   let studentInfo: { display_name: string | null; avatar_url: string | null } | null = null;
@@ -52,37 +52,30 @@ export default async function FacultyCaseDetailPage({
       .limit(1),
   ]);
 
-  const safeCaseData = {
-    id: caseData.id,
-    institution_id: caseData.institution_id,
-    conversation_id: caseData.conversation_id,
-    incident_type: caseData.incident_type,
-    severity: caseData.severity,
-    summary: caseData.summary,
-    location: caseData.location,
-    duration: caseData.duration,
-    people_involved: caseData.people_involved,
-    others_affected: caseData.others_affected,
-    status: caseData.status,
-    recommended_action: caseData.recommended_action,
-    identity_revealed: caseData.identity_revealed,
-    auto_alerted: caseData.auto_alerted,
-    created_at: caseData.created_at,
-    updated_at: caseData.updated_at,
-  };
-
   return (
-    <div className="space-y-4">
-      <Link href="/faculty/cases" className="text-sm text-primary hover:underline">
-        ← Back to cases
-      </Link>
-      <FacultyCaseDetail
-        caseData={safeCaseData}
-        messages={messages ?? []}
-        notes={notes ?? []}
-        studentInfo={studentInfo}
-        revealRequests={(revealRequests as Array<{ id: string; status: "pending" | "accepted" | "declined"; created_at: string; responded_at: string | null }>) ?? []}
-      />
-    </div>
+    <FacultyCaseDetailView
+      caseData={{
+        id: caseData.id,
+        institution_id: caseData.institution_id,
+        conversation_id: caseData.conversation_id,
+        incident_type: caseData.incident_type,
+        severity: caseData.severity,
+        summary: caseData.summary,
+        location: caseData.location,
+        duration: caseData.duration,
+        people_involved: caseData.people_involved,
+        others_affected: caseData.others_affected,
+        status: caseData.status as CaseStatus,
+        recommended_action: caseData.recommended_action,
+        identity_revealed: caseData.identity_revealed,
+        auto_alerted: caseData.auto_alerted,
+        created_at: caseData.created_at,
+        updated_at: caseData.updated_at,
+      }}
+      messages={messages ?? []}
+      notes={notes ?? []}
+      studentInfo={studentInfo}
+      revealRequests={(revealRequests as Array<{ id: string; status: "pending" | "accepted" | "declined"; created_at: string; responded_at: string | null }>) ?? []}
+    />
   );
 }

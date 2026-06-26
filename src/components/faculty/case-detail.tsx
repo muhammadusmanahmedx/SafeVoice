@@ -10,10 +10,17 @@ import {
 import {
   sendCaseMessage, updateCaseStatus, addCaseNote, requestIdentityReveal,
 } from "@/lib/actions/case-messages";
-import { CASE_STATUS_LABELS, RISK_LEVEL_COLORS } from "@/types";
+import { RISK_LEVEL_COLORS } from "@/types";
 import { formatDate, cn } from "@/lib/utils";
 import type { CaseStatus } from "@/types";
 import { UserX, Clock, CheckCircle2, XCircle, MessageCircle, StickyNote, Shield, User, AlertTriangle } from "lucide-react";
+import { useLanguage } from "@/components/providers/language-provider";
+import {
+  formatMessage,
+  getCaseStatusLabel,
+  getIncidentTypeLabel,
+  getRiskLevelLabel,
+} from "@/lib/i18n/labels";
 
 interface RevealRequest {
   id: string;
@@ -46,6 +53,7 @@ interface FacultyCaseDetailProps {
 
 export function FacultyCaseDetail({ caseData, messages, notes, studentInfo, revealRequests = [] }: FacultyCaseDetailProps) {
   const router = useRouter();
+  const { t } = useLanguage();
   const [status, setStatus] = useState(caseData.status);
   const [response, setResponse] = useState("");
   const [note, setNote] = useState("");
@@ -96,45 +104,41 @@ export function FacultyCaseDetail({ caseData, messages, notes, studentInfo, reve
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
-      {/* Main column */}
       <div className="space-y-5 lg:col-span-2">
         {caseData.auto_alerted && (
           <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
             <div>
-              <p className="text-sm font-semibold text-amber-700">Auto-detected high-risk alert</p>
-              <p className="mt-0.5 text-xs text-amber-600">
-                SafeVoice flagged this conversation automatically. The student has not formally submitted a report yet.
-              </p>
+              <p className="text-sm font-semibold text-amber-700">{t("faculty.caseDetail.autoAlertTitle")}</p>
+              <p className="mt-0.5 text-xs text-amber-600">{t("faculty.caseDetail.autoAlertDesc")}</p>
             </div>
           </div>
         )}
 
-        {/* Case header */}
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="text-base font-semibold capitalize">
-                {caseData.incident_type.replace(/_/g, " ")}
+              <h2 className="text-base font-semibold">
+                {getIncidentTypeLabel(t, caseData.incident_type)}
               </h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                Submitted {formatDate(caseData.created_at)}
+                {formatMessage(t("faculty.caseDetail.submitted"), { date: formatDate(caseData.created_at) })}
               </p>
             </div>
             <div className="flex items-center gap-2">
               <span className={cn(
-                "rounded-full px-2.5 py-1 text-xs font-medium capitalize",
+                "rounded-full px-2.5 py-1 text-xs font-medium",
                 RISK_LEVEL_COLORS[caseData.severity as keyof typeof RISK_LEVEL_COLORS]
               )}>
-                {caseData.severity}
+                {getRiskLevelLabel(t, caseData.severity)}
               </span>
               <Select value={status} onValueChange={(v) => handleStatusChange(v as CaseStatus)}>
                 <SelectTrigger className="h-8 w-36 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(CASE_STATUS_LABELS).map(([key, label]) => (
-                    <SelectItem key={key} value={key} className="text-xs">{label}</SelectItem>
+                  {(["new", "in_progress", "escalated", "resolved", "unsubstantiated"] as CaseStatus[]).map((key) => (
+                    <SelectItem key={key} value={key} className="text-xs">{getCaseStatusLabel(t, key)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -145,30 +149,35 @@ export function FacultyCaseDetail({ caseData, messages, notes, studentInfo, reve
 
           <div className="mt-4 grid gap-1.5 text-sm sm:grid-cols-2">
             {caseData.location && (
-              <p className="text-muted-foreground"><span className="font-medium text-foreground">Location:</span> {caseData.location}</p>
+              <p className="text-muted-foreground">
+                <span className="font-medium text-foreground">{t("common.location")}:</span> {caseData.location}
+              </p>
             )}
             {caseData.duration && (
-              <p className="text-muted-foreground"><span className="font-medium text-foreground">Duration:</span> {caseData.duration}</p>
+              <p className="text-muted-foreground">
+                <span className="font-medium text-foreground">{t("common.duration")}:</span> {caseData.duration}
+              </p>
             )}
             {caseData.people_involved && (
-              <p className="text-muted-foreground"><span className="font-medium text-foreground">People:</span> {caseData.people_involved}</p>
+              <p className="text-muted-foreground">
+                <span className="font-medium text-foreground">{t("common.people")}:</span> {caseData.people_involved}
+              </p>
             )}
             <p className="text-muted-foreground">
-              <span className="font-medium text-foreground">Others affected:</span>{" "}
-              {caseData.others_affected ? "Yes" : "No"}
+              <span className="font-medium text-foreground">{t("common.othersAffected")}:</span>{" "}
+              {caseData.others_affected ? t("common.yes") : t("common.no")}
             </p>
           </div>
         </div>
 
-        {/* Messages */}
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="mb-4 flex items-center gap-2">
             <MessageCircle className="h-4 w-4 text-muted-foreground" />
-            <h3 className="text-sm font-semibold">Anonymous Messages</h3>
+            <h3 className="text-sm font-semibold">{t("faculty.caseDetail.anonymousMessages")}</h3>
           </div>
           <div className="space-y-3">
             {messages.length === 0 && (
-              <p className="text-sm text-muted-foreground">No messages yet</p>
+              <p className="text-sm text-muted-foreground">{t("faculty.caseDetail.noMessages")}</p>
             )}
             {messages.map((msg) => (
               <div key={msg.id}
@@ -190,38 +199,34 @@ export function FacultyCaseDetail({ caseData, messages, notes, studentInfo, reve
             <Textarea
               value={response}
               onChange={(e) => setResponse(e.target.value)}
-              placeholder="Write a supportive, anonymous response…"
+              placeholder={t("faculty.caseDetail.responsePlaceholder")}
               rows={3}
               className="resize-none text-sm"
             />
             <Button size="sm" onClick={handleRespond} disabled={loading || !response.trim()}>
-              Send Response
+              {t("faculty.caseDetail.sendResponse")}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Sidebar column */}
       <div className="space-y-4">
-        {/* Identity reveal */}
         <div className="rounded-xl border border-border bg-card p-4">
           <div className="mb-3 flex items-center gap-2">
             <Shield className="h-4 w-4 text-muted-foreground" />
-            <h3 className="text-sm font-semibold">Student Identity</h3>
+            <h3 className="text-sm font-semibold">{t("faculty.caseDetail.studentIdentity")}</h3>
           </div>
 
           {!identityKnown && !revealRequested && (
             <>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                 <UserX className="h-4 w-4 shrink-0" />
-                <span>Identity is anonymous</span>
+                <span>{t("faculty.caseDetail.identityAnonymous")}</span>
               </div>
               <Button variant="outline" size="sm" className="w-full" onClick={handleRequestReveal} disabled={loading}>
-                Request Identity Reveal
+                {t("faculty.caseDetail.requestReveal")}
               </Button>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Student must consent before their identity is shared.
-              </p>
+              <p className="mt-2 text-xs text-muted-foreground">{t("faculty.caseDetail.revealConsentHint")}</p>
             </>
           )}
 
@@ -242,9 +247,9 @@ export function FacultyCaseDetail({ caseData, messages, notes, studentInfo, reve
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-green-700">
-                    {studentInfo?.display_name ?? "Student"}
+                    {studentInfo?.display_name ?? t("common.studentDefaultName")}
                   </p>
-                  <p className="text-xs text-green-600">Identity shared with consent</p>
+                  <p className="text-xs text-green-600">{t("faculty.caseDetail.identitySharedConsent")}</p>
                 </div>
               </div>
             </div>
@@ -254,14 +259,12 @@ export function FacultyCaseDetail({ caseData, messages, notes, studentInfo, reve
             <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-amber-600 shrink-0" />
-                <p className="text-sm font-medium text-amber-700">Request Sent</p>
+                <p className="text-sm font-medium text-amber-700">{t("faculty.caseDetail.requestSent")}</p>
               </div>
-              <p className="mt-1 text-xs text-amber-600">
-                Waiting for the student to respond. You&apos;ll be notified of their decision.
-              </p>
+              <p className="mt-1 text-xs text-amber-600">{t("faculty.caseDetail.requestSentDesc")}</p>
               {latestReveal && (
                 <p className="mt-1.5 text-[10px] text-muted-foreground">
-                  Requested {formatDate(latestReveal.created_at)}
+                  {formatMessage(t("faculty.caseDetail.requested"), { date: formatDate(latestReveal.created_at) })}
                 </p>
               )}
             </div>
@@ -271,14 +274,12 @@ export function FacultyCaseDetail({ caseData, messages, notes, studentInfo, reve
             <div className="rounded-lg bg-green-500/10 border border-green-500/20 p-3">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-                <p className="text-sm font-medium text-green-700">Identity Shared</p>
+                <p className="text-sm font-medium text-green-700">{t("faculty.caseDetail.identityShared")}</p>
               </div>
-              <p className="mt-1 text-xs text-green-600">
-                The student accepted your request. Refresh the page to view their profile.
-              </p>
+              <p className="mt-1 text-xs text-green-600">{t("faculty.caseDetail.identitySharedDesc")}</p>
               {latestReveal?.responded_at && (
                 <p className="mt-1.5 text-[10px] text-muted-foreground">
-                  Accepted {formatDate(latestReveal.responded_at)}
+                  {formatMessage(t("faculty.caseDetail.accepted"), { date: formatDate(latestReveal.responded_at) })}
                 </p>
               )}
             </div>
@@ -288,29 +289,26 @@ export function FacultyCaseDetail({ caseData, messages, notes, studentInfo, reve
             <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
               <div className="flex items-center gap-2">
                 <XCircle className="h-4 w-4 text-destructive shrink-0" />
-                <p className="text-sm font-medium text-destructive">Request Declined</p>
+                <p className="text-sm font-medium text-destructive">{t("faculty.caseDetail.requestDeclined")}</p>
               </div>
-              <p className="mt-1 text-xs text-destructive/80">
-                The student has chosen to remain anonymous. Please respect their decision.
-              </p>
+              <p className="mt-1 text-xs text-destructive/80">{t("faculty.caseDetail.requestDeclinedDesc")}</p>
               {latestReveal?.responded_at && (
                 <p className="mt-1.5 text-[10px] text-muted-foreground">
-                  Declined {formatDate(latestReveal.responded_at)}
+                  {formatMessage(t("faculty.caseDetail.declined"), { date: formatDate(latestReveal.responded_at) })}
                 </p>
               )}
             </div>
           )}
         </div>
 
-        {/* Internal notes */}
         <div className="rounded-xl border border-border bg-card p-4">
           <div className="mb-3 flex items-center gap-2">
             <StickyNote className="h-4 w-4 text-muted-foreground" />
-            <h3 className="text-sm font-semibold">Internal Notes</h3>
+            <h3 className="text-sm font-semibold">{t("faculty.caseDetail.internalNotes")}</h3>
           </div>
           <div className="space-y-2 mb-3">
             {notes.length === 0 && (
-              <p className="text-xs text-muted-foreground">No notes yet</p>
+              <p className="text-xs text-muted-foreground">{t("faculty.caseDetail.noNotes")}</p>
             )}
             {notes.map((n) => (
               <div key={n.id} className="rounded-lg bg-muted p-3 text-xs">
@@ -322,12 +320,12 @@ export function FacultyCaseDetail({ caseData, messages, notes, studentInfo, reve
           <Textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Add internal note… (not visible to student)"
+            placeholder={t("faculty.caseDetail.notePlaceholder")}
             rows={2}
             className="resize-none text-xs"
           />
           <Button variant="secondary" size="sm" className="mt-2 w-full" onClick={handleAddNote} disabled={!note.trim()}>
-            Add Note
+            {t("faculty.caseDetail.addNote")}
           </Button>
         </div>
       </div>

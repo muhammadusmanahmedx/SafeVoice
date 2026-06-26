@@ -11,6 +11,7 @@ import { shouldShowCrisisResources, shouldShowEscalation } from "@/lib/ai/risk";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import type { RiskAssessment } from "@/types";
 import { Mic, MicOff, Send, Sparkles, Shield } from "lucide-react";
+import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
 
 interface ChatInterfaceProps {
@@ -144,14 +145,15 @@ function AnimatedText({ text, isStreaming }: { text: string; isStreaming: boolea
   return <>{formatMessage(displayed)}</>;
 }
 
-const SUGGESTIONS = [
-  "I've been feeling really anxious about exams lately",
-  "Some classmates have been making me feel uncomfortable",
-  "I'm struggling to keep up and feeling completely burnt out",
-  "I don't have anyone to talk to about what I'm going through",
-];
-
 export function ChatInterface({ initialConversationId, initialMessages = [] }: ChatInterfaceProps) {
+  const { t, locale } = useLanguage();
+
+  const suggestions = [
+    t("student.chat.suggestions.anxious"),
+    t("student.chat.suggestions.uncomfortable"),
+    t("student.chat.suggestions.burnout"),
+    t("student.chat.suggestions.lonely"),
+  ];
   const conversationIdRef = useRef(initialConversationId);
   const [input, setInput] = useState("");
   const [escalationOpen, setEscalationOpen] = useState(false);
@@ -160,8 +162,9 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const voiceBaseRef = useRef("");
-  const { isListening, isSupported, error: voiceError, toggle: toggleVoice, stop: stopVoice } =
-    useSpeechRecognition();
+  const { isListening, isSupported, errorKey: voiceErrorKey, toggle: toggleVoice, stop: stopVoice } =
+    useSpeechRecognition(locale);
+  const voiceError = voiceErrorKey ? t(voiceErrorKey) : null;
 
   const transport = useMemo(
     () =>
@@ -250,22 +253,22 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex h-[calc(100vh-9rem)] flex-col overflow-hidden rounded-xl border border-border bg-card">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card">
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-border px-4 py-3 shrink-0">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
           <Sparkles className="h-4 w-4 text-primary" />
         </div>
         <div>
-          <p className="text-sm font-semibold">SafeVoice AI</p>
-          <p className="text-xs text-muted-foreground">Wellbeing assistant · Strictly confidential</p>
+          <p className="text-sm font-semibold">{t("student.chat.aiName")}</p>
+          <p className="text-xs text-muted-foreground">{t("student.chat.aiSubtitle")}</p>
         </div>
         <div className="ml-auto flex items-center gap-1.5">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
           </span>
-          <span className="text-xs text-muted-foreground">Active</span>
+          <span className="text-xs text-muted-foreground">{t("student.chat.statusActive")}</span>
         </div>
       </div>
 
@@ -277,12 +280,12 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
                 <Shield className="h-7 w-7 text-primary" />
               </div>
-              <p className="text-base font-semibold">Hi, I&apos;m here for you</p>
+              <p className="text-base font-semibold">{t("student.chat.emptyTitle")}</p>
               <p className="mt-2 max-w-xs text-sm text-muted-foreground">
-                This is a safe, confidential space. What&apos;s on your mind today?
+                {t("student.chat.emptySubtitle")}
               </p>
               <div className="mt-6 flex flex-col gap-2 w-full max-w-sm">
-                {SUGGESTIONS.map((s) => (
+                {suggestions.map((s) => (
                   <button
                     key={s}
                     onClick={() => setInput(s)}
@@ -364,7 +367,7 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
       </div>
 
       {/* Input */}
-      <div className="shrink-0 border-t border-border p-4">
+      <div className="shrink-0 border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <form onSubmit={handleSubmit} className="mx-auto max-w-2xl">
           {voiceError && (
             <p className="mb-2 text-center text-xs text-destructive">{voiceError}</p>
@@ -381,7 +384,7 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
                 )}
                 onClick={handleVoiceToggle}
                 disabled={isLoading}
-                title={isListening ? "Stop recording" : "Speak to SafeVoice"}
+                title={isListening ? t("student.chat.stopRecording") : t("student.chat.speakToSafeVoice")}
               >
                 {isListening ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
               </Button>
@@ -396,7 +399,11 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
                   handleSubmit();
                 }
               }}
-              placeholder={isListening ? "Listening… speak now" : "Share what's on your mind… (Enter to send)"}
+              placeholder={
+                isListening
+                  ? t("student.chat.placeholderListening")
+                  : t("student.chat.placeholderDefault")
+              }
               className="min-h-[36px] flex-1 resize-none border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
               rows={1}
             />
@@ -410,7 +417,7 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
             </Button>
           </div>
           <p className="mt-2 text-center text-xs text-muted-foreground">
-            Everything is confidential. In a crisis, contact emergency services immediately.
+            {t("student.chat.footerDisclaimer")}
           </p>
         </form>
       </div>

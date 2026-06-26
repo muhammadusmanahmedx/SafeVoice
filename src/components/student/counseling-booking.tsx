@@ -28,6 +28,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { bookCounselingSession, cancelCounselingBooking } from "@/lib/actions/counseling";
+import { useLanguage } from "@/components/providers/language-provider";
 import { canJoinSession, isBookingActive, formatSessionDay } from "@/lib/counseling/meeting-access";
 import Link from "next/link";
 import {
@@ -83,13 +84,14 @@ function formatSlotTime(iso: string) {
   });
 }
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEKDAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 
 export function CounselingBookingPanel({
   availableSlots,
   weeklyRanges,
   myBookings,
 }: CounselingBookingPanelProps) {
+  const { t } = useLanguage();
   const router = useRouter();
   const today = useMemo(() => new Date(), []);
   const [viewMonth, setViewMonth] = useState(() => startOfMonth(today));
@@ -191,7 +193,7 @@ export function CounselingBookingPanel({
       {upcoming.length > 0 && (
         <section className="rounded-2xl border border-border bg-card p-5">
           <h2 className="text-sm font-extrabold uppercase tracking-wider text-[#193852]">
-            Your Upcoming Sessions
+            {t("student.counseling.upcomingSessions")}
           </h2>
           <div className="mt-4 space-y-3">
             {upcoming.map((booking) => (
@@ -209,11 +211,16 @@ export function CounselingBookingPanel({
                       {formatSlotTime(booking.slot.slot_at)}
                     </p>
                     {booking.topic && (
-                      <p className="mt-1 text-xs text-muted-foreground">Topic: {booking.topic}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {t("common.topic")}: {booking.topic}
+                      </p>
                     )}
                     {!canJoinSession(booking.slot.slot_at, booking.slot.duration_minutes) && (
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Join available on {formatSessionDay(booking.slot.slot_at)}
+                        {t("student.counseling.joinAvailableOn").replace(
+                          "{date}",
+                          formatSessionDay(booking.slot.slot_at)
+                        )}
                       </p>
                     )}
                   </div>
@@ -223,7 +230,7 @@ export function CounselingBookingPanel({
                     <Button asChild size="sm" className="bg-green-600 hover:bg-green-700 text-white">
                       <Link href={`/counseling/meeting/${booking.id}`}>
                         <Video className="mr-1.5 h-3.5 w-3.5" />
-                        Join session
+                        {t("common.joinSession")}
                       </Link>
                     </Button>
                   )}
@@ -234,7 +241,7 @@ export function CounselingBookingPanel({
                     disabled={loading}
                   >
                     <XCircle className="mr-1.5 h-3.5 w-3.5" />
-                    Cancel
+                    {t("common.cancel")}
                   </Button>
                 </div>
               </div>
@@ -246,9 +253,9 @@ export function CounselingBookingPanel({
       {availableSlots.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-10 text-center">
           <CalendarIcon className="mx-auto h-10 w-10 text-muted-foreground/50" />
-          <p className="mt-3 text-sm font-medium">No counseling availability yet</p>
+          <p className="mt-3 text-sm font-medium">{t("student.counseling.noAvailabilityTitle")}</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Faculty counselors haven&apos;t published their weekly hours. Check back soon.
+            {t("student.counseling.noAvailabilityDesc")}
           </p>
         </div>
       ) : (
@@ -258,7 +265,7 @@ export function CounselingBookingPanel({
             <section className="rounded-2xl border border-border bg-card p-5">
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-sm font-extrabold uppercase tracking-wider text-[#193852]">
-                Select a date
+                {t("student.counseling.selectDate")}
               </h2>
               <div className="flex items-center gap-1">
                 <Button
@@ -286,12 +293,12 @@ export function CounselingBookingPanel({
             </div>
 
             <div className="mb-2 grid grid-cols-7 gap-1">
-              {WEEKDAYS.map((d) => (
+              {WEEKDAY_KEYS.map((d) => (
                 <div
                   key={d}
                   className="py-1 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
                 >
-                  {d}
+                  {t(`student.counseling.weekdays.${d}`)}
                 </div>
               ))}
             </div>
@@ -312,7 +319,7 @@ export function CounselingBookingPanel({
                     disabled={!clickable}
                     onClick={() => handleDayClick(day)}
                     className={cn(
-                      "relative flex h-11 items-center justify-center rounded-lg text-sm font-medium transition-all",
+                      "relative flex min-h-11 min-w-[2.75rem] touch-manipulation items-center justify-center rounded-lg text-sm font-medium transition-all",
                       !inMonth && "text-muted-foreground/30",
                       inMonth && !hasSlots && "text-muted-foreground",
                       inMonth && isPast && "text-muted-foreground/40",
@@ -333,11 +340,11 @@ export function CounselingBookingPanel({
             <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <span className="h-3 w-3 rounded bg-blue-500/20 ring-1 ring-blue-400/40" />
-                Counselor available
+                {t("student.counseling.counselorAvailable")}
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="h-3 w-3 rounded bg-blue-600" />
-                Selected day
+                {t("student.counseling.selectedDay")}
               </span>
             </div>
           </section>
@@ -353,22 +360,22 @@ export function CounselingBookingPanel({
                   className="mb-2 flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
-                  All time frames
+                  {t("student.counseling.allTimeFrames")}
                 </button>
               )}
               <h2 className="text-sm font-extrabold uppercase tracking-wider text-[#193852]">
                 {!selectedDate
-                  ? "Pick a day"
+                  ? t("student.counseling.pickDay")
                   : selectedFrame
                     ? `${formatTimeLabel(selectedFrame.start_time)} – ${formatTimeLabel(selectedFrame.end_time)}`
                     : format(selectedDate, "EEEE, MMM d")}
               </h2>
               <p className="mt-1 text-xs text-muted-foreground">
                 {!selectedDate
-                  ? "Blue dates on the calendar have open slots."
+                  ? t("student.counseling.pickDayHint")
                   : selectedFrame
-                    ? `${selectedFrame.counselor_name} · choose a time`
-                    : "Choose an availability window."}
+                    ? t("student.counseling.chooseTime").replace("{counselor}", selectedFrame.counselor_name)
+                    : t("student.counseling.chooseWindow")}
               </p>
             </div>
 
@@ -376,13 +383,13 @@ export function CounselingBookingPanel({
               <div className="space-y-2">
                 {!selectedDate && (
                   <div className="rounded-lg bg-muted/50 px-4 py-8 text-center text-sm text-muted-foreground">
-                    Click a highlighted date on the calendar
+                    {t("student.counseling.clickHighlightedDate")}
                   </div>
                 )}
 
                 {selectedDate && !selectedFrameId && framesForDay.length === 0 && (
                   <div className="rounded-lg bg-muted/50 px-4 py-8 text-center text-sm text-muted-foreground">
-                    No availability on this day
+                    {t("student.counseling.noAvailabilityDay")}
                   </div>
                 )}
 
@@ -395,7 +402,7 @@ export function CounselingBookingPanel({
                       type="button"
                       onClick={() => setSelectedFrameId(frame.id)}
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-xl border border-border bg-background p-3 text-left transition-all",
+                        "flex min-h-11 w-full touch-manipulation items-center gap-3 rounded-xl border border-border bg-background p-3 text-left transition-all",
                         "hover:border-blue-400 hover:bg-blue-50/50"
                       )}
                     >
@@ -408,8 +415,8 @@ export function CounselingBookingPanel({
                         </p>
                         <p className="flex items-center gap-1 text-xs text-muted-foreground">
                           <User className="h-3 w-3" />
-                          {frame.counselor_name} · {frame.slots.length} slot
-                          {frame.slots.length === 1 ? "" : "s"}
+                          {frame.counselor_name} · {frame.slots.length}{" "}
+                          {frame.slots.length === 1 ? t("common.slot") : t("common.slots")}
                         </p>
                       </div>
                       <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -428,7 +435,7 @@ export function CounselingBookingPanel({
                         setSelectedSlot(slot);
                       }}
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-xl border border-border bg-background p-3 text-left transition-all",
+                        "flex min-h-11 w-full touch-manipulation items-center gap-3 rounded-xl border border-border bg-background p-3 text-left transition-all",
                         "hover:border-blue-400 hover:bg-blue-50/50"
                       )}
                     >
@@ -443,7 +450,7 @@ export function CounselingBookingPanel({
                           })}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {slot.duration_minutes} min session
+                          {t("common.minSession").replace("{minutes}", String(slot.duration_minutes))}
                         </p>
                       </div>
                     </button>
@@ -461,15 +468,15 @@ export function CounselingBookingPanel({
               <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
                 <CheckCircle2 className="h-6 w-6 text-green-600" />
               </div>
-              <DialogTitle className="text-center">Session Booked!</DialogTitle>
+              <DialogTitle className="text-center">{t("student.counseling.sessionBookedTitle")}</DialogTitle>
               <DialogDescription className="text-center">
-                Your counseling session is confirmed.
+                {t("student.counseling.sessionBookedDesc")}
               </DialogDescription>
             </DialogHeader>
           ) : (
             <>
               <DialogHeader>
-                <DialogTitle>Confirm your session</DialogTitle>
+                <DialogTitle>{t("student.counseling.confirmTitle")}</DialogTitle>
                 <DialogDescription>
                   {selectedSlot && (
                     <>
@@ -479,12 +486,12 @@ export function CounselingBookingPanel({
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-2 py-2">
-                <Label htmlFor="topic">What would you like to discuss? (optional)</Label>
+                <Label htmlFor="topic">{t("student.counseling.topicLabel")}</Label>
                 <Textarea
                   id="topic"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  placeholder="e.g. Exam stress, anxiety, relationship concerns…"
+                  placeholder={t("student.counseling.topicPlaceholder")}
                   rows={3}
                   className="resize-none"
                 />
@@ -492,10 +499,10 @@ export function CounselingBookingPanel({
               {error && <p className="text-sm text-destructive">{error}</p>}
               <DialogFooter className="gap-2">
                 <Button variant="outline" onClick={() => setSelectedSlot(null)}>
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
                 <Button onClick={handleBook} disabled={loading}>
-                  {loading ? "Booking…" : "Book session"}
+                  {loading ? t("student.counseling.booking") : t("student.counseling.bookSession")}
                 </Button>
               </DialogFooter>
             </>
@@ -506,18 +513,17 @@ export function CounselingBookingPanel({
       <Dialog open={!!cancelTargetId} onOpenChange={(open) => !open && setCancelTargetId(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Cancel counseling session?</DialogTitle>
+            <DialogTitle>{t("student.counseling.cancelTitle")}</DialogTitle>
             <DialogDescription>
-              This will remove your booking and free the time slot for other students.
-              This action cannot be undone.
+              {t("student.counseling.cancelDescription")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setCancelTargetId(null)} disabled={loading}>
-              No, keep session
+              {t("student.counseling.keepSession")}
             </Button>
             <Button variant="destructive" onClick={handleCancelConfirm} disabled={loading}>
-              {loading ? "Cancelling…" : "Yes, cancel session"}
+              {loading ? t("student.counseling.cancelling") : t("student.counseling.yesCancel")}
             </Button>
           </DialogFooter>
         </DialogContent>

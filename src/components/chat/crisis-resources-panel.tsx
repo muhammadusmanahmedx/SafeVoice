@@ -1,6 +1,7 @@
 "use client";
 
 import { Phone, ExternalLink, Building2, AlertTriangle } from "lucide-react";
+import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
 
 export interface CrisisResource {
@@ -19,6 +20,8 @@ interface CrisisResourcesPanelProps {
 }
 
 export function CrisisResourcesPanel({ resources, riskLevel, className }: CrisisResourcesPanelProps) {
+  const { t } = useLanguage();
+
   if (resources.length === 0) return null;
 
   const isCritical = riskLevel === "critical";
@@ -38,11 +41,11 @@ export function CrisisResourcesPanel({ resources, riskLevel, className }: Crisis
           className={cn("h-4 w-4 shrink-0", isCritical ? "text-risk-critical" : "text-risk-high")}
         />
         <p className="text-sm font-semibold">
-          {isCritical ? "Immediate support is available" : "Support resources for you"}
+          {isCritical ? t("student.chat.crisis.criticalTitle") : t("student.chat.crisis.highTitle")}
         </p>
       </div>
       <p className="mb-3 text-xs text-muted-foreground">
-        You don&apos;t have to face this alone. These resources are here if you need them right now.
+        {t("student.chat.crisis.description")}
       </p>
       <div className="space-y-2">
         {resources.map((r) => (
@@ -71,7 +74,7 @@ export function CrisisResourcesPanel({ resources, riskLevel, className }: Crisis
                   target={r.url.startsWith("http") ? "_blank" : undefined}
                   rel={r.url.startsWith("http") ? "noopener noreferrer" : undefined}
                 >
-                  {r.type === "helpline" ? "Call now" : "Visit"}
+                  {r.type === "helpline" ? t("student.chat.crisis.callNow") : t("student.chat.crisis.visit")}
                   <ExternalLink className="h-3 w-3" />
                 </a>
               )}

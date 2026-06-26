@@ -1,8 +1,52 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireApiProfile } from "@/lib/auth/get-profile";
 import { formatDate } from "@/lib/utils";
+import {
+  DEFAULT_LOCALE,
+  LOCALE_COOKIE,
+  isLocale,
+  translate,
+  type Locale,
+} from "@/lib/i18n";
+import { formatMessage, getIncidentTypeLabel, getRiskLevelLabel } from "@/lib/i18n/labels";
 
-export async function GET() {
+function getLocaleFromRequest(request: Request): Locale {
+  const cookieHeader = request.headers.get("cookie");
+  if (cookieHeader) {
+    const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${LOCALE_COOKIE}=([^;]*)`));
+    if (match) {
+      try {
+        const value = decodeURIComponent(match[1]);
+        if (isLocale(value)) return value;
+      } catch {
+        /* fall through */
+      }
+    }
+  }
+
+  const acceptLang = request.headers.get("accept-language");
+  if (acceptLang) {
+    const first = acceptLang.split(",")[0]?.split("-")[0]?.trim().toLowerCase();
+    if (first && isLocale(first)) return first;
+  }
+
+  return DEFAULT_LOCALE;
+}
+
+function formatSlotDateTime(iso: string, locale: Locale): string {
+  return new Date(iso).toLocaleString(locale === "ar" ? "ar" : locale === "hi" ? "hi-IN" : undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+export async function GET(request: Request) {
+  const locale = getLocaleFromRequest(request);
+  const t = (key: string) => translate(locale, key);
+
   const auth = await requireApiProfile();
   if ("error" in auth) return Response.json({ error: auth.error }, { status: auth.status });
   const { profile } = auth;
@@ -10,7 +54,6 @@ export async function GET() {
   const notifications: object[] = [];
 
   if (profile.role === "student") {
-    // Faculty messages on student's cases
     const { data: msgs } = await supabase
       .from("case_messages")
       .select("id, content, created_at, case_id")
@@ -31,7 +74,7 @@ export async function GET() {
       notifications.push({
         id: `msg-${m.id}`,
         type: "message",
-        title: "Faculty replied to your case",
+        title: t("notifications.student.facultyRepliedTitle"),
         body: m.content.slice(0, 80) + (m.content.length > 80 ? "…" : ""),
         time: formatDate(m.created_at),
         read: false,
@@ -39,7 +82,6 @@ export async function GET() {
       });
     }
 
-    // Counseling booking confirmations for student
     const { data: myBookings } = await supabase
       .from("counseling_bookings")
       .select("id, created_at, slot:counseling_slots(slot_at)")
@@ -53,17 +95,18 @@ export async function GET() {
       notifications.push({
         id: `bkg-${b.id}`,
         type: "counseling_booked",
-        title: "Counseling session booked",
+        title: t("notifications.student.counselingBookedTitle"),
         body: slot
-          ? `Your session is scheduled for ${new Date(slot.slot_at).toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}.`
-          : "Your counseling session has been confirmed.",
+          ? formatMessage(t("notifications.student.counselingBookedBody"), {
+              datetime: formatSlotDateTime(slot.slot_at, locale),
+            })
+          : t("notifications.student.counselingBookedBodyFallback"),
         time: formatDate(b.created_at),
         read: false,
         href: "/counseling",
       });
     }
 
-    // Identity reveal requests targeting student
     const { data: revealReqs } = await supabase
       .from("identity_reveal_requests")
       .select("id, status, created_at, case_id")
@@ -83,8 +126,8 @@ export async function GET() {
       notifications.push({
         id: `rev-${r.id}`,
         type: "identity_request",
-        title: "Identity reveal requested",
-        body: "A faculty member has requested to know your identity for better support.",
+        title: t("notifications.student.identityRequestTitle"),
+        body: t("notifications.student.identityRequestBody"),
         time: formatDate(r.created_at),
         read: r.status !== "pending",
         href: `/cases?id=${r.case_id}`,
@@ -93,7 +136,6 @@ export async function GET() {
   }
 
   if (profile.role === "faculty" || profile.role === "admin") {
-    // New cases in institution
     const { data: newCases } = await supabase
       .from("anonymous_cases" as "cases")
       .select("id, incident_type, severity, created_at, auto_alerted")
@@ -104,20 +146,25 @@ export async function GET() {
 
     for (const c of newCases ?? []) {
       const autoAlerted = (c as { auto_alerted?: boolean }).auto_alerted;
+      const incidentLabel = getIncidentTypeLabel(t, c.incident_type);
       notifications.push({
         id: `case-${c.id}`,
         type: autoAlerted ? "risk_alert" : "new_case",
-        title: autoAlerted ? "High-risk alert detected" : "New case submitted",
+        title: autoAlerted
+          ? t("notifications.faculty.highRiskAlertTitle")
+          : t("notifications.faculty.newCaseTitle"),
         body: autoAlerted
-          ? `${c.incident_type.replace(/_/g, " ")} — AI auto-detected, review immediately`
-          : `${c.incident_type.replace(/_/g, " ")} — severity: ${c.severity}`,
+          ? formatMessage(t("notifications.faculty.highRiskAlertBody"), { incidentType: incidentLabel })
+          : formatMessage(t("notifications.faculty.newCaseBody"), {
+              incidentType: incidentLabel,
+              severity: getRiskLevelLabel(t, c.severity),
+            }),
         time: formatDate(c.created_at),
         read: false,
         href: `/faculty/cases/${c.id}`,
       });
     }
 
-    // Student messages on faculty's cases
     const { data: stuMsgs } = await supabase
       .from("case_messages")
       .select("id, content, created_at, case_id")
@@ -138,7 +185,7 @@ export async function GET() {
       notifications.push({
         id: `smsg-${m.id}`,
         type: "message",
-        title: "Student replied to a case",
+        title: t("notifications.faculty.studentRepliedTitle"),
         body: m.content.slice(0, 80) + (m.content.length > 80 ? "…" : ""),
         time: formatDate(m.created_at),
         read: false,
@@ -146,7 +193,6 @@ export async function GET() {
       });
     }
 
-    // New counseling bookings on faculty's slots
     const { data: mySlots } = await supabase
       .from("counseling_slots")
       .select("id")
@@ -167,10 +213,12 @@ export async function GET() {
         notifications.push({
           id: `fbkg-${b.id}`,
           type: "counseling_booking_received",
-          title: "New counseling booking",
+          title: t("notifications.faculty.newBookingTitle"),
           body: slot
-            ? `A student booked a session on ${new Date(slot.slot_at).toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}.`
-            : "A student has booked a counseling session with you.",
+            ? formatMessage(t("notifications.faculty.newBookingBody"), {
+                datetime: formatSlotDateTime(slot.slot_at, locale),
+              })
+            : t("notifications.faculty.newBookingBodyFallback"),
           time: formatDate(b.created_at),
           read: false,
           href: "/faculty/counseling",
@@ -178,7 +226,6 @@ export async function GET() {
       }
     }
 
-    // Identity reveal responses
     const { data: revealResp } = await supabase
       .from("identity_reveal_requests")
       .select("id, status, responded_at, case_id")
@@ -192,10 +239,12 @@ export async function GET() {
       notifications.push({
         id: `rresp-${r.id}`,
         type: accepted ? "identity_accepted" : "identity_declined",
-        title: accepted ? "Identity reveal accepted" : "Identity reveal declined",
+        title: accepted
+          ? t("notifications.faculty.identityAcceptedTitle")
+          : t("notifications.faculty.identityDeclinedTitle"),
         body: accepted
-          ? "The student has agreed to share their identity. Check the case for details."
-          : "The student has chosen to remain anonymous.",
+          ? t("notifications.faculty.identityAcceptedBody")
+          : t("notifications.faculty.identityDeclinedBody"),
         time: formatDate(r.responded_at!),
         read: false,
         href: `/faculty/cases/${r.case_id}`,
@@ -203,7 +252,6 @@ export async function GET() {
     }
   }
 
-  // Sort by time desc, cap at 20
   const sorted = (notifications as Array<{ time: string }>)
     .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
     .slice(0, 20);

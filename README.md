@@ -64,9 +64,33 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Deployment
 
 1. Push to GitHub
-2. Deploy to [Vercel](https://vercel.com)
+2. Deploy to [Vercel](https://vercel.com) (HTTPS is required for PWA install)
 3. Set environment variables in Vercel dashboard
-4. Add production URL to Supabase Auth redirect URLs
+4. Configure Supabase Auth for your production domain (see below)
+5. On a phone, open the deployed URL and install:
+   - **Android (Chrome):** tap **Install app** when prompted, or use the in-app banner
+   - **iPhone (Safari):** Share → **Add to Home Screen**
+
+### Supabase Auth (production)
+
+In **Supabase Dashboard → Authentication → URL Configuration**:
+
+| Setting | Example |
+|---------|---------|
+| **Site URL** | `https://your-app.vercel.app` |
+| **Redirect URLs** | `https://your-app.vercel.app/**` |
+
+Also add `http://localhost:3000/**` for local development if not already present.
+
+Cookie-based auth via middleware works in mobile Safari and Chrome when served over HTTPS.
+
+### Progressive Web App
+
+SafeVoice is an installable PWA (no App Store required). The service worker caches static assets only — chat and API routes always use the network.
+
+- Manifest: `src/app/manifest.ts`
+- Icons: `public/icon-192.png`, `public/icon-512.png`, `public/apple-touch-icon.png`
+- Service worker: `@ducanh2912/next-pwa` (disabled in `npm run dev`, enabled on production build)
 
 ## Project Structure
 
