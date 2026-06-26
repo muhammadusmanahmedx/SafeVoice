@@ -52,6 +52,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){try{var tz=Intl.DateTimeFormat().resolvedOptions().timeZone;document.cookie="user-timezone="+encodeURIComponent(tz)+";path=/;max-age=31536000;SameSite=Lax";var m=document.cookie.match(/(?:^|;\\s*)${LOCALE_COOKIE}=([^;]*)/);var lang=m?decodeURIComponent(m[1]):"en";if(["en","ar","hi"].indexOf(lang)===-1)lang="en";document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";}catch(e){}})();`,
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__pwaInstallPrompt=e;window.dispatchEvent(new Event("pwa:install-available"));});window.addEventListener("appinstalled",function(){window.__pwaInstallPrompt=null;window.dispatchEvent(new Event("pwa:installed"));});})();`,
+          }}
+        />
         <ThemeProvider attribute="class" defaultTheme="light" themes={["light", "dark", "calm"]}>
           <LanguageProvider>
             <TimezoneCookie />

@@ -778,6 +778,13 @@ export const en = {
     installMobileHint: "Open SafeVoice on your phone to add it to your home screen.",
     installDesktopHint:
       "In Chrome or Edge, click the install icon in the address bar. On Android, tap Install when prompted.",
+    installIosIntro: "On iPhone or iPad, add SafeVoice to your home screen in 3 steps:",
+    installAndroidIntro: "On Android, add SafeVoice to your home screen in 2 steps:",
+    iosStep1: "Tap the Share button in the browser toolbar.",
+    iosStep2: "Choose \"Add to Home Screen\".",
+    iosStep3: "Tap \"Add\" — SafeVoice now opens like an app.",
+    androidStep1: "Tap the browser menu (⋮) in the top right.",
+    androidStep2: "Choose \"Install app\" or \"Add to Home screen\".",
   },
 
   incident: {

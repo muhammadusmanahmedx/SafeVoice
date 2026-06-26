@@ -780,6 +780,13 @@ export const ar: Dictionary = {
     installMobileHint: "افتح SafeVoice على هاتفك لإضافته إلى الشاشة الرئيسية.",
     installDesktopHint:
       "في Chrome أو Edge، اضغط أيقونة التثبيت في شريط العنوان. على Android، اضغط تثبيت عند ظهور المطالبة.",
+    installIosIntro: "على iPhone أو iPad، أضف SafeVoice إلى الشاشة الرئيسية في 3 خطوات:",
+    installAndroidIntro: "على Android، أضف SafeVoice إلى الشاشة الرئيسية في خطوتين:",
+    iosStep1: "اضغط زر المشاركة في شريط أدوات المتصفح.",
+    iosStep2: "اختر \"إضافة إلى الشاشة الرئيسية\".",
+    iosStep3: "اضغط \"إضافة\" — يفتح SafeVoice الآن مثل تطبيق.",
+    androidStep1: "اضغط قائمة المتصفح (⋮) في أعلى اليمين.",
+    androidStep2: "اختر \"تثبيت التطبيق\" أو \"إضافة إلى الشاشة الرئيسية\".",
   },
 
   incident: {

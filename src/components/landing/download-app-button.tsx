@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Share, Smartphone } from "lucide-react";
+import { Download, Plus, Share, MoreVertical } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
 import {
@@ -30,11 +30,25 @@ export function DownloadAppButton({ label, variant = "hero", className }: Downlo
 
   async function handleClick() {
     if (canNativeInstall) {
-      await promptInstall();
+      const accepted = await promptInstall();
+      if (!accepted) setDialogOpen(true);
       return;
     }
     setDialogOpen(true);
   }
+
+  const iosSteps = [
+    { icon: Share, text: t("pwa.iosStep1") },
+    { icon: Plus, text: t("pwa.iosStep2") },
+    { icon: Download, text: t("pwa.iosStep3") },
+  ];
+
+  const androidSteps = [
+    { icon: MoreVertical, text: t("pwa.androidStep1") },
+    { icon: Download, text: t("pwa.androidStep2") },
+  ];
+
+  const steps = isIos ? iosSteps : androidSteps;
 
   return (
     <>
@@ -58,25 +72,21 @@ export function DownloadAppButton({ label, variant = "hero", className }: Downlo
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t("pwa.installTitle")}</DialogTitle>
-            <DialogDescription asChild>
-              <div className="space-y-4 pt-2 text-sm text-muted-foreground">
-                {isIos ? (
-                  <p className="flex items-start gap-3">
-                    <Share className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                    <span>{t("pwa.installIos")}</span>
-                  </p>
-                ) : (
-                  <>
-                    <p className="flex items-start gap-3">
-                      <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                      <span>{t("pwa.installMobileHint")}</span>
-                    </p>
-                    <p>{t("pwa.installDesktopHint")}</p>
-                  </>
-                )}
-              </div>
+            <DialogDescription>
+              {isIos ? t("pwa.installIosIntro") : t("pwa.installAndroidIntro")}
             </DialogDescription>
           </DialogHeader>
+          <ol className="space-y-3">
+            {steps.map((step, i) => (
+              <li key={i} className="flex items-center gap-3">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                  {i + 1}
+                </span>
+                <step.icon className="h-4 w-4 shrink-0 text-primary" />
+                <span className="text-sm text-foreground">{step.text}</span>
+              </li>
+            ))}
+          </ol>
         </DialogContent>
       </Dialog>
     </>

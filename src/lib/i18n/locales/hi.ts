@@ -780,6 +780,13 @@ export const hi: Dictionary = {
     installMobileHint: "SafeVoice को होम स्क्रीन पर जोड़ने के लिए इसे अपने फ़ोन पर खोलें।",
     installDesktopHint:
       "Chrome या Edge में, एड्रेस बार में इंस्टॉल आइकन दबाएँ। Android पर, संकेत मिलने पर Install दबाएँ।",
+    installIosIntro: "iPhone या iPad पर, SafeVoice को 3 चरणों में होम स्क्रीन पर जोड़ें:",
+    installAndroidIntro: "Android पर, SafeVoice को 2 चरणों में होम स्क्रीन पर जोड़ें:",
+    iosStep1: "ब्राउज़र टूलबार में Share बटन दबाएँ।",
+    iosStep2: "\"Add to Home Screen\" चुनें।",
+    iosStep3: "\"Add\" दबाएँ — अब SafeVoice ऐप की तरह खुलेगा।",
+    androidStep1: "ऊपर दाईं ओर ब्राउज़र मेनू (⋮) दबाएँ।",
+    androidStep2: "\"Install app\" या \"Add to Home screen\" चुनें।",
   },
 
   incident: {
