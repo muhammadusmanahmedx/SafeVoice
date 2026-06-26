@@ -7,6 +7,11 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
+  /* Space for fixed mobile tab bar + home indicator */
+  .pb-mobile-nav {
+    padding-bottom: calc(3.75rem + env(safe-area-inset-bottom, 0px) + 0.5rem);
+  }
+
   .pt-safe {
     padding-top: env(safe-area-inset-top, 0px);
   }

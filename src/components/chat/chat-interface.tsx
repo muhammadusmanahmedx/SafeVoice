@@ -316,7 +316,7 @@ export function ChatInterface({ initialConversationId, initialMessages = [] }: C
       </div>
 
       {/* Input */}
-      <div className="shrink-0 border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="shrink-0 border-t border-border p-4">
         <form onSubmit={handleSubmit} className="mx-auto max-w-2xl">
           {voiceError && (
             <p className="mb-2 text-center text-xs text-destructive">{voiceError}</p>

@@ -66,7 +66,7 @@ export const en = {
 
   nav: {
     dashboard: "Dashboard",
-    aiAssistant: "Counseling Chat",
+    aiAssistant: "AI Chat",
     mood: "Mood",
     resources: "Resources",
     counseling: "Counseling",

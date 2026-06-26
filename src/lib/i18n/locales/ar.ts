@@ -68,7 +68,7 @@ export const ar: Dictionary = {
 
   nav: {
     dashboard: "لوحة التحكم",
-    aiAssistant: "محادثة الإرشاد",
+    aiAssistant: "دردشة الذكاء الاصطناعي",
     mood: "المزاج",
     resources: "الموارد",
     counseling: "الإرشاد",

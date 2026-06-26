@@ -68,7 +68,7 @@ export const hi: Dictionary = {
 
   nav: {
     dashboard: "डैशबोर्ड",
-    aiAssistant: "परामर्श चैट",
+    aiAssistant: "AI चैट",
     mood: "मनःस्थिति",
     resources: "संसाधन",
     counseling: "परामर्श",

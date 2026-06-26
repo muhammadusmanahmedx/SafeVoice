@@ -224,13 +224,15 @@ export function PortalShell({
                     <ThemeToggle />
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <form action={signOut} className="w-full">
-                      <button type="submit" className="flex w-full items-center gap-2 text-sm">
-                        <LogOut className="h-4 w-4" />
-                        {t("common.signOut")}
-                      </button>
-                    </form>
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2"
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      void signOut();
+                    }}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    {t("common.signOut")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -238,16 +240,15 @@ export function PortalShell({
           </div>
         </header>
 
-        <main className="flex-1 min-h-0 overflow-y-auto p-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:p-6 lg:pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <main className="flex-1 min-h-0 overflow-y-auto p-4 pb-mobile-nav sm:p-6 lg:pb-[max(1rem,env(safe-area-inset-bottom))]">
           {children}
         </main>
 
         <nav
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-sm lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-sm pb-safe lg:hidden"
           aria-label={t("nav.mainNavigation")}
         >
-          <div className="pb-safe" />
-          <div className="flex h-14 items-stretch">
+          <div className="flex h-[3.75rem] items-stretch px-1 pt-1">
             {bottomTabs.map((item) => (
               <NavLink key={item.href} item={item} active={isActive(item.href)} compact />
             ))}
